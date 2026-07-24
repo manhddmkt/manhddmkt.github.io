@@ -288,10 +288,10 @@ function finalCta() {
 
 function homePage() {
   const categories = [
-    ["Apparel & Accessories", "/assets/apparel-accessories.jpg"],
-    ["Home & Living", "/assets/home-living.jpg"],
-    ["Beauty & Personal Care", "/assets/beauty-personal-care.jpg"],
-    ["Gifts & Personalization", "/assets/gifts-personalized-products.jpg"],
+    ["Home Decor", "/assets/home-living.jpg"],
+    ["In New", "/assets/apparel-accessories.jpg"],
+    ["Decoration", "/assets/gifts-personalized-products.jpg"],
+    ["Beauty Accessories", "/assets/beauty-personal-care.jpg"],
   ];
 
   return `
