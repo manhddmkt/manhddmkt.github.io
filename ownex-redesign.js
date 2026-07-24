@@ -128,9 +128,16 @@ function header() {
       <div class="header-inner">
         ${brand}
         <nav class="desktop-nav" aria-label="Primary navigation">
+          <div class="nav-group">
+            <a href="/about">About Us <span>⌄</span></a>
+            <div class="nav-dropdown">
+              <a href="/about">About OWNEX</a>
+              <a href="/contact">Contact</a>
+            </div>
+          </div>
           <a href="/catalog">Catalog</a>
           <div class="nav-group">
-            <a href="/solutions">Solutions <span>⌄</span></a>
+            <a href="/solutions">Services <span>⌄</span></a>
             <div class="nav-dropdown">
               ${solutions
                 .map(
@@ -140,30 +147,31 @@ function header() {
                 .join("")}
             </div>
           </div>
-          <a href="/integrations">Integrations</a>
-          <a href="/resources">Resources</a>
+          <a href="/resources">Blog</a>
           <div class="nav-group">
-            <a href="/about">Company <span>⌄</span></a>
+            <a href="/help">Support <span>⌄</span></a>
             <div class="nav-dropdown">
-              <a href="/about">About OWNEX</a>
               <a href="/help">Help center</a>
+              <a href="/faq">FAQs</a>
               <a href="/contact">Contact</a>
             </div>
           </div>
         </nav>
         <div class="header-actions">
-          <a class="text-link" href="/contact">Talk to our team</a>
+          <form class="header-search" role="search">
+            <span class="header-search-icon" aria-hidden="true"></span>
+            <input name="search" type="search" aria-label="Search products" placeholder="What are you looking?" />
+          </form>
           <a class="button button-primary button-small" href="/contact">Start a project <span>↗</span></a>
         </div>
         <details class="mobile-nav">
           <summary aria-label="Open menu"><span></span><span></span><span></span></summary>
           <div>
+            <a href="/about">About Us</a>
             <a href="/catalog">Catalog</a>
-            <a href="/solutions">Solutions</a>
-            <a href="/integrations">Integrations</a>
-            <a href="/resources">Resources</a>
-            <a href="/about">About OWNEX</a>
-            <a href="/contact">Contact</a>
+            <a href="/solutions">Services</a>
+            <a href="/resources">Blog</a>
+            <a href="/help">Support</a>
           </div>
         </details>
       </div>
@@ -640,8 +648,8 @@ function resolvePage(path) {
 function bindPageInteractions() {
   const search = document.querySelector("#product-search");
   if (search) {
-    search.addEventListener("input", (event) => {
-      const query = event.target.value.trim().toLowerCase();
+    const filterCatalog = (value) => {
+      const query = value.trim().toLowerCase();
       const filtered = products.filter(
         (item) =>
           item.name.toLowerCase().includes(query) ||
@@ -650,8 +658,22 @@ function bindPageInteractions() {
       document.querySelector("#catalog-results").innerHTML = filtered.length
         ? productGrid(filtered)
         : `<div class="empty-state"><h3>No matching products yet.</h3><p>Try another term or contact the team with the product direction you need.</p></div>`;
-    });
+    };
+    const initialQuery = new URLSearchParams(window.location.search).get("search") || "";
+    search.value = initialQuery;
+    if (initialQuery) filterCatalog(initialQuery);
+    search.addEventListener("input", (event) => filterCatalog(event.target.value));
   }
+
+  document.querySelectorAll(".header-search").forEach((form) => {
+    form.addEventListener("submit", (event) => {
+      event.preventDefault();
+      const query = form.elements.search.value.trim();
+      const target = query ? `/catalog?search=${encodeURIComponent(query)}` : "/catalog";
+      window.history.pushState({}, "", target);
+      render("/catalog");
+    });
+  });
 
   document.querySelectorAll(".newsletter-form").forEach((form) => {
     form.addEventListener("submit", (event) => {
