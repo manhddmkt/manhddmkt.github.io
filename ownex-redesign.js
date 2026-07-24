@@ -311,11 +311,9 @@ function homePage() {
           </div>
         </div>
         <div class="hero-visual" aria-label="Custom product collection">
-          <div class="visual-panel"><span>CAPABILITY 01</span><strong>From product idea</strong><p>to reliable execution</p></div>
           <img class="hero-product hero-product-main" src="/assets/01-wooden-baseball-glove-sign-300x300-1.png" alt="Personalized wooden baseball glove sign" />
           <img class="hero-product hero-product-top" src="/assets/05-silly-goose-caps-300x240-1.png" alt="Embroidered custom cap" />
           <img class="hero-product hero-product-bottom" src="/assets/04-personalized-plant-pots-420x220-1.png" alt="Personalized plant pots" />
-          <div class="visual-badge"><span>✓</span><div><strong>Execution-ready</strong><small>Clear standards. Reliable outcomes.</small></div></div>
         </div>
       </div>
     </section>
@@ -367,7 +365,6 @@ function homePage() {
     <section class="section story">
       <div class="story-media">
         <img src="/assets/our-factory-4-1024x614.jpg" alt="Commerce operations team" />
-        <div class="story-label"><span>OWNEX STANDARD</span><strong>Reliable execution, made repeatable.</strong></div>
       </div>
       <div class="story-copy">
         <span class="eyebrow">BUILT AROUND RELIABILITY</span>
