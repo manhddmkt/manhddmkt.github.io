@@ -1202,6 +1202,114 @@ img {
   border-radius: 20px;
 }
 
+.catalog-layout {
+  display: grid;
+  grid-template-columns: 270px minmax(0, 1fr);
+  align-items: start;
+  gap: 42px;
+}
+
+.catalog-categories {
+  position: sticky;
+  top: 132px;
+  padding: 25px 24px 28px;
+  background: #f7faff;
+  border: 1px solid var(--line);
+  border-radius: 20px;
+}
+
+.catalog-categories h2 {
+  margin: 0 0 17px;
+  color: var(--navy);
+  font-size: 22px;
+}
+
+.catalog-categories a {
+  color: #536b84;
+  transition:
+    color 160ms ease,
+    background 160ms ease;
+}
+
+.catalog-categories a:hover,
+.catalog-categories a.active {
+  color: var(--blue);
+}
+
+.catalog-all,
+.catalog-category-group > a {
+  display: block;
+  padding: 10px 11px;
+  border-radius: 9px;
+  font-size: 14px;
+  font-weight: 680;
+}
+
+.catalog-all.active,
+.catalog-category-group > a.active {
+  background: #e9f2ff;
+}
+
+.catalog-category-group {
+  padding-top: 5px;
+}
+
+.catalog-category-group > div {
+  padding: 2px 0 7px 19px;
+}
+
+.catalog-category-group > div a {
+  display: block;
+  padding: 6px 5px;
+  font-size: 12px;
+  line-height: 1.35;
+}
+
+.catalog-main {
+  min-width: 0;
+}
+
+.catalog-product-grid {
+  margin-top: 34px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.catalog-product-grid .product-card {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+}
+
+.product-price {
+  margin-top: 10px;
+  color: var(--navy);
+  font-size: 14px;
+  font-weight: 720;
+}
+
+.catalog-pagination {
+  margin-top: 52px;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 25px;
+}
+
+.catalog-pagination a {
+  color: var(--blue);
+  font-size: 13px;
+  font-weight: 680;
+}
+
+.catalog-pagination a:last-child {
+  text-align: right;
+}
+
+.catalog-pagination strong {
+  color: #718398;
+  font-size: 12px;
+}
+
 .catalog-toolbar strong,
 .catalog-toolbar > div > span {
   display: block;
@@ -1987,6 +2095,15 @@ textarea {
   .footer-newsletter {
     grid-column: 1 / -1;
   }
+
+  .catalog-layout {
+    grid-template-columns: 230px minmax(0, 1fr);
+    gap: 28px;
+  }
+
+  .catalog-product-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }
 
 @media (max-width: 820px) {
@@ -2219,6 +2336,18 @@ textarea {
   .catalog-toolbar {
     align-items: stretch;
     flex-direction: column;
+  }
+
+  .catalog-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .catalog-categories {
+    position: static;
+  }
+
+  .catalog-product-grid {
+    grid-template-columns: 1fr;
   }
 
   .integration-card {
