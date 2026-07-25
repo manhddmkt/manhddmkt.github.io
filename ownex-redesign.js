@@ -65,6 +65,56 @@ const products = [
   },
 ];
 
+const catalogGroups = [
+  {
+    name: "Accessories",
+    children: [
+      "Beauty Accessories",
+      "Car Accessories",
+      "Graduation",
+      "Keychains",
+      "Travel Accessories",
+    ],
+  },
+  {
+    name: "Home & Living",
+    children: [
+      "Decoration",
+      "Flags",
+      "Home Decor",
+      "Lights",
+      "Mugs",
+      "Ornaments",
+      "Picture Frames & Displays",
+      "Pillows & Covers",
+      "Suncatchers",
+      "Toys & Games",
+      "Wall Arts",
+    ],
+  },
+  {
+    name: "Kid’s Clothing",
+    children: ["Baby bodysuits", "Kid's Jersey", "Kid's Pajamas"],
+  },
+  {
+    name: "Men’s Clothing",
+    children: [
+      "Men's Hawaiian Shirts",
+      "Men's Hoodies",
+      "Men's Jersey",
+      "Men's Pajamas",
+      "Men's Polo Shirts",
+      "Men's Tank Top",
+    ],
+  },
+  {
+    name: "Women’s Clothing",
+    children: ["Women's Pajamas"],
+  },
+];
+
+let catalogProducts = [...products];
+
 const solutions = [
   {
     slug: "product-development",
@@ -265,6 +315,33 @@ function productGrid(items = products) {
     </div>`;
 }
 
+function decodeCatalogText(value = "") {
+  return value
+    .replaceAll("&amp;", "&")
+    .replaceAll("&#8217;", "’")
+    .replaceAll("&#039;", "'");
+}
+
+function catalogProductGrid(items) {
+  return `
+    <div class="product-grid catalog-product-grid">
+      ${items
+        .map(
+          (item) => `
+            <a class="product-card" href="/product/${item.slug}">
+              <div class="product-image">
+                <img src="${item.image}" alt="${item.name}" loading="lazy" />
+                <span>View product ↗</span>
+              </div>
+              <small>${item.category || "In New"}</small>
+              <h3>${item.name}</h3>
+              <b class="product-price">${item.price > 0 ? `${item.currencySymbol || "$"}${item.price.toFixed(2)}` : "Contact for price"}</b>
+            </a>`,
+        )
+        .join("")}
+    </div>`;
+}
+
 function resourceGrid() {
   return `
     <div class="resource-grid">
@@ -437,20 +514,100 @@ function homePage() {
 }
 
 function catalogPage() {
+  const params = new URLSearchParams(window.location.search);
+  const search = (params.get("search") || "").trim();
+  const category = (params.get("category") || "").trim();
+  const page = Math.max(1, Number.parseInt(params.get("page") || "1", 10) || 1);
+  const perPage = 12;
+  const group = catalogGroups.find((item) => item.name === category);
+  const filtered = catalogProducts.filter((item) => {
+    const itemCategories = item.categories || [item.category].filter(Boolean);
+    const matchesCategory =
+      !category ||
+      itemCategories.includes(category) ||
+      Boolean(group && group.children.some((child) => itemCategories.includes(child)));
+    const haystack = `${item.name} ${itemCategories.join(" ")}`.toLowerCase();
+    return matchesCategory && (!search || haystack.includes(search.toLowerCase()));
+  });
+  const pageCount = Math.max(1, Math.ceil(filtered.length / perPage));
+  const currentPage = Math.min(page, pageCount);
+  const visibleProducts = filtered.slice(
+    (currentPage - 1) * perPage,
+    currentPage * perPage,
+  );
+  const linkFor = (nextPage) => {
+    const next = new URLSearchParams();
+    if (search) next.set("search", search);
+    if (category) next.set("category", category);
+    if (nextPage > 1) next.set("page", String(nextPage));
+    const query = next.toString();
+    return `/catalog${query ? `?${query}` : ""}`;
+  };
+
   return `
     ${pageHero("PRODUCT CATALOG", "Find the right starting point.", "Explore customizable product directions prepared for dependable commercial execution.")}
     <section class="section catalog-page">
-      <div class="catalog-toolbar">
-        <div><strong>${products.length} selected products</strong><span>Curated for the redesign preview</span></div>
-        <label><span>Search products</span><input id="product-search" placeholder="Search products or categories" /></label>
+      <div class="catalog-layout">
+        <aside class="catalog-categories" aria-label="Product categories">
+          <h2>Categories</h2>
+          <a class="catalog-all ${!category ? "active" : ""}" href="/catalog">All category</a>
+          ${catalogGroups
+            .map(
+              (item) => `
+                <div class="catalog-category-group">
+                  <a class="${category === item.name ? "active" : ""}" href="/catalog?category=${encodeURIComponent(item.name)}">${item.name}</a>
+                  <div>
+                    ${item.children
+                      .map(
+                        (child) =>
+                          `<a class="${category === child ? "active" : ""}" href="/catalog?category=${encodeURIComponent(child)}">${child}</a>`,
+                      )
+                      .join("")}
+                  </div>
+                </div>`,
+            )
+            .join("")}
+        </aside>
+        <div class="catalog-main">
+          <div class="catalog-toolbar">
+            <div>
+              <strong>${filtered.length} products${category ? ` in ${category}` : ""}</strong>
+              <span>Explore available products and categories</span>
+            </div>
+            <form id="catalog-search-form">
+              <label>
+                <span>Search products</span>
+                <input id="product-search" name="search" value="${search}" placeholder="Search products or categories" />
+              </label>
+            </form>
+          </div>
+          <div id="catalog-results">
+            ${
+              visibleProducts.length
+                ? catalogProductGrid(visibleProducts)
+                : `<div class="empty-state"><h3>No matching products yet.</h3><p>Try another product name or category.</p></div>`
+            }
+          </div>
+          ${
+            pageCount > 1
+              ? `<nav class="catalog-pagination" aria-label="Catalog pages">
+                  ${currentPage > 1 ? `<a href="${linkFor(currentPage - 1)}">← Previous</a>` : "<span></span>"}
+                  <strong>Page ${currentPage} of ${pageCount}</strong>
+                  ${currentPage < pageCount ? `<a href="${linkFor(currentPage + 1)}">Next →</a>` : "<span></span>"}
+                </nav>`
+              : ""
+          }
+        </div>
       </div>
-      <div id="catalog-results">${productGrid(products)}</div>
     </section>
     ${finalCta()}`;
 }
 
 function productPage(slug) {
-  const item = products.find((product) => product.slug === slug) || products[0];
+  const item =
+    catalogProducts.find((product) => product.slug === slug) ||
+    products.find((product) => product.slug === slug) ||
+    products[0];
   return `
     <section class="section product-detail">
       <div class="detail-image"><img src="${item.image}" alt="${item.name}" /></div>
@@ -646,23 +803,19 @@ function resolvePage(path) {
 }
 
 function bindPageInteractions() {
-  const search = document.querySelector("#product-search");
-  if (search) {
-    const filterCatalog = (value) => {
-      const query = value.trim().toLowerCase();
-      const filtered = products.filter(
-        (item) =>
-          item.name.toLowerCase().includes(query) ||
-          item.category.toLowerCase().includes(query),
-      );
-      document.querySelector("#catalog-results").innerHTML = filtered.length
-        ? productGrid(filtered)
-        : `<div class="empty-state"><h3>No matching products yet.</h3><p>Try another term or contact the team with the product direction you need.</p></div>`;
-    };
-    const initialQuery = new URLSearchParams(window.location.search).get("search") || "";
-    search.value = initialQuery;
-    if (initialQuery) filterCatalog(initialQuery);
-    search.addEventListener("input", (event) => filterCatalog(event.target.value));
+  const catalogSearch = document.querySelector("#catalog-search-form");
+  if (catalogSearch) {
+    catalogSearch.addEventListener("submit", (event) => {
+      event.preventDefault();
+      const params = new URLSearchParams(window.location.search);
+      const query = catalogSearch.elements.search.value.trim();
+      if (query) params.set("search", query);
+      else params.delete("search");
+      params.delete("page");
+      const target = `/catalog${params.toString() ? `?${params}` : ""}`;
+      window.history.pushState({}, "", target);
+      render("/catalog");
+    });
   }
 
   document.querySelectorAll(".header-search").forEach((form) => {
@@ -701,6 +854,34 @@ function render(path = window.location.pathname) {
   window.scrollTo({ top: 0, behavior: "instant" });
 }
 
+async function loadCatalogData() {
+  try {
+    const response = await fetch("/data/products.json");
+    if (!response.ok) return;
+    const payload = await response.json();
+    if (!Array.isArray(payload.products) || !payload.products.length) return;
+    catalogProducts = payload.products.map((item) => {
+      const categories = (item.categories || []).map((category) =>
+        decodeCatalogText(category.name),
+      );
+      return {
+        slug: item.slug,
+        name: decodeCatalogText(item.name),
+        category: categories[0] || "In New",
+        categories,
+        image: item.images?.[0]?.src || "/assets/gifts-personalized-products.jpg",
+        description:
+          decodeCatalogText(item.summary || "") ||
+          "Custom product available through the synchronized OWNEX COMMERCE catalog.",
+        price: Number(item.price),
+        currencySymbol: item.currencySymbol || "$",
+      };
+    });
+  } catch {
+    catalogProducts = [...products];
+  }
+}
+
 document.addEventListener("click", (event) => {
   const link = event.target.closest("a");
   if (
@@ -713,9 +894,9 @@ document.addEventListener("click", (event) => {
     return;
   }
   event.preventDefault();
-  window.history.pushState({}, "", link.pathname);
+  window.history.pushState({}, "", `${link.pathname}${link.search}`);
   render(link.pathname);
 });
 
 window.addEventListener("popstate", () => render());
-render();
+loadCatalogData().finally(() => render());
