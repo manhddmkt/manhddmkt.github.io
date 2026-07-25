@@ -518,7 +518,7 @@ function catalogPage() {
   const search = (params.get("search") || "").trim();
   const category = (params.get("category") || "").trim();
   const page = Math.max(1, Number.parseInt(params.get("page") || "1", 10) || 1);
-  const perPage = 12;
+  const perPage = 64;
   const group = catalogGroups.find((item) => item.name === category);
   const filtered = catalogProducts.filter((item) => {
     const itemCategories = item.categories || [item.category].filter(Boolean);
