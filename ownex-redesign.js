@@ -333,7 +333,6 @@ function catalogProductGrid(items) {
                 <img src="${item.image}" alt="${item.name}" loading="lazy" />
                 <span>View product ↗</span>
               </div>
-              <small>${item.category || "In New"}</small>
               <h3>${item.name}</h3>
               <b class="product-price">${item.price > 0 ? `${item.currencySymbol || "$"}${item.price.toFixed(2)}` : "Contact for price"}</b>
             </a>`,
