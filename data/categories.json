@@ -1,0 +1,55 @@
+{
+  "groups": [
+    {
+      "name": "Accessories",
+      "children": [
+        "Beauty Accessories",
+        "Car Accessories",
+        "Graduation",
+        "Keychains",
+        "Travel Accessories"
+      ]
+    },
+    {
+      "name": "Home & Living",
+      "children": [
+        "Decoration",
+        "Flags",
+        "Home Decor",
+        "Lights",
+        "Mugs",
+        "Ornaments",
+        "Picture Frames & Displays",
+        "Pillows & Covers",
+        "Suncatchers",
+        "Toys & Games",
+        "Wall Arts"
+      ]
+    },
+    {
+      "name": "Kid’s Clothing",
+      "children": [
+        "Baby bodysuits",
+        "Kid's Jersey",
+        "Kid's Pajamas"
+      ]
+    },
+    {
+      "name": "Men’s Clothing",
+      "children": [
+        "Men's Hawaiian Shirts",
+        "Men's Hoodies",
+        "Men's Jersey",
+        "Men's Pajamas",
+        "Men's Polo Shirts",
+        "Men's Tank Top"
+      ]
+    },
+    {
+      "name": "Women’s Clothing",
+      "children": [
+        "Women's Pajamas"
+      ]
+    }
+  ]
+}
