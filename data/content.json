@@ -1,0 +1,32 @@
+{
+  "homepage": {
+    "heroEyebrow": "COMMERCE OPERATIONS, BUILT TO SCALE",
+    "heroTitle": "Operate with confidence.",
+    "heroAccent": "Grow without limits.",
+    "heroDescription": "OWNEX COMMERCE brings product development, standardized operations, and global fulfillment into one dependable commercial capability.",
+    "primaryCtaLabel": "Explore solutions",
+    "primaryCtaUrl": "/solutions",
+    "secondaryCtaLabel": "View product catalog",
+    "secondaryCtaUrl": "/catalog",
+    "categoryEyebrow": "EXPLORE THE CATALOG",
+    "categoryTitle": "Product possibilities for every direction.",
+    "categoryDescription": "Start with a proven category, then shape the product around your commercial vision.",
+    "storyEyebrow": "BUILT AROUND RELIABILITY",
+    "storyTitle": "The operating confidence behind sustainable growth.",
+    "storyDescription": "Growth becomes more predictable when product readiness, quality expectations, and order execution follow one consistent standard. OWNEX COMMERCE is built to make that standard repeatable.",
+    "finalCtaEyebrow": "READY FOR THE NEXT MOVE?",
+    "finalCtaTitle": "Turn your commercial vision into reliable execution.",
+    "finalCtaLabel": "Start a conversation",
+    "finalCtaUrl": "/contact"
+  },
+  "site": {
+    "siteName": "OWNEX COMMERCE",
+    "email": "hello@ownexcommerce.com",
+    "phone": "",
+    "footerDescription": "Standardized commerce operations that turn ambition into reliable execution and sustainable growth.",
+    "headerCtaLabel": "Start a project",
+    "headerCtaUrl": "/contact",
+    "catalogPageSize": 64,
+    "catalogColumns": 4
+  }
+}
