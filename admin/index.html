@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="noindex,nofollow" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; connect-src 'self' https://api.github.com; img-src 'self' data: blob: https:; style-src 'self'; script-src 'self';"
+    />
+    <meta name="theme-color" content="#f4f7fb" />
+    <title>OWNEX Commerce Admin</title>
+    <link rel="stylesheet" href="./admin.css" />
+  </head>
+  <body>
+    <section class="login-screen" id="loginScreen">
+      <div class="login-shell">
+        <div class="login-brand">
+          <div class="brand-mark">OWNE<span>X</span></div>
+          <small>COMMERCE ADMIN</small>
+        </div>
+        <span class="eyebrow">TRUNG TÂM QUẢN TRỊ</span>
+        <h1>Quản lý nội dung website OWNEX COMMERCE.</h1>
+        <p>
+          Kết nối bằng GitHub để chỉnh sửa trực tiếp nội dung website đang chạy
+          trên Cloudflare. Mã truy cập chỉ được giữ trong phiên trình duyệt này.
+        </p>
+        <form id="loginForm" class="login-form">
+          <label>
+            <span>GitHub Fine-grained token</span>
+            <input
+              id="tokenInput"
+              type="password"
+              autocomplete="off"
+              placeholder="github_pat_..."
+              required
+            />
+          </label>
+          <button type="submit" class="primary-button">Kết nối GitHub</button>
+          <p class="form-message" id="loginMessage" aria-live="polite"></p>
+        </form>
+        <details class="token-help">
+          <summary>Cách tạo mã truy cập an toàn</summary>
+          <ol>
+            <li>Mở GitHub → Settings → Developer settings.</li>
+            <li>Tạo Fine-grained token chỉ cho repo <b>manhddmkt.github.io</b>.</li>
+            <li>Cấp quyền <b>Contents: Read and write</b>.</li>
+          </ol>
+          <a
+            href="https://github.com/settings/personal-access-tokens/new"
+            target="_blank"
+            rel="noreferrer"
+            >Mở trang tạo token ↗</a
+          >
+        </details>
+      </div>
+    </section>
+
+    <div class="admin-shell is-hidden" id="adminShell">
+      <aside class="sidebar" id="sidebar">
+        <div class="sidebar-brand">
+          <div class="brand-mark">OWNE<span>X</span></div>
+          <small>COMMERCE ADMIN</small>
+        </div>
+        <nav id="adminNav">
+          <button data-view="dashboard" class="active">
+            <span>⌂</span>Tổng quan
+          </button>
+          <div class="nav-label">NỘI DUNG</div>
+          <button data-view="homepage"><span>✦</span>Trang chủ</button>
+          <button data-view="products"><span>◇</span>Sản phẩm</button>
+          <button data-view="categories"><span>⌘</span>Danh mục</button>
+          <button data-view="posts"><span>▤</span>Bài viết</button>
+          <button data-view="media"><span>▧</span>Thư viện ảnh</button>
+          <div class="nav-label">HỆ THỐNG</div>
+          <button data-view="settings"><span>⚙</span>Cài đặt website</button>
+        </nav>
+        <div class="sidebar-footer">
+          <span class="connection-dot"></span>
+          <div><b>Đã kết nối</b><small>GitHub · Cloudflare</small></div>
+        </div>
+      </aside>
+
+      <main class="main">
+        <header class="topbar">
+          <button class="menu-button" id="menuButton" aria-label="Mở menu">☰</button>
+          <div>
+            <h1 id="viewTitle">Tổng quan</h1>
+            <p id="viewSubtitle">Theo dõi và quản lý nội dung website.</p>
+          </div>
+          <div class="topbar-actions">
+            <a
+              class="ghost-button"
+              href="/"
+              target="_blank"
+              rel="noreferrer"
+              >Xem website ↗</a
+            >
+            <button class="profile-button" id="disconnectButton">
+              <span>ĐM</span>
+              <div><b>Đào Đức Mạnh</b><small>Ngắt kết nối</small></div>
+            </button>
+          </div>
+        </header>
+        <div class="content" id="content">
+          <div class="loading-card"><i></i>Đang tải dữ liệu...</div>
+        </div>
+      </main>
+    </div>
+
+    <dialog id="editorDialog">
+      <form method="dialog" class="dialog-card" id="editorForm">
+        <div class="dialog-head">
+          <div>
+            <span class="eyebrow" id="dialogEyebrow">CHỈNH SỬA</span>
+            <h2 id="dialogTitle">Nội dung</h2>
+          </div>
+          <button type="button" class="icon-button" data-close-dialog aria-label="Đóng">×</button>
+        </div>
+        <div id="dialogFields" class="dialog-fields"></div>
+        <div class="dialog-actions">
+          <button type="button" class="secondary-button" data-close-dialog>Hủy</button>
+          <button value="default" class="primary-button" id="dialogSave">
+            Lưu thay đổi
+          </button>
+        </div>
+      </form>
+    </dialog>
+
+    <div class="toast is-hidden" id="toast" role="status"></div>
+    <script src="./admin.js"></script>
+  </body>
+</html>
