@@ -65,7 +65,7 @@ const products = [
   },
 ];
 
-const catalogGroups = [
+let catalogGroups = [
   {
     name: "Accessories",
     children: [
@@ -142,7 +142,7 @@ const solutions = [
   },
 ];
 
-const resources = [
+let resources = [
   {
     slug: "prepare-products-for-scalable-growth",
     title: "How to prepare custom products for scalable growth",
@@ -165,6 +165,33 @@ const resources = [
       "Why clear specifications, inspection criteria, and feedback loops matter as volume grows.",
   },
 ];
+
+let managedContent = {
+  homepage: {},
+  site: {
+    email: "hello@ownexcommerce.com",
+    footerDescription:
+      "Standardized commerce operations that turn ambition into reliable execution and sustainable growth.",
+    headerCtaLabel: "Start a project",
+    headerCtaUrl: "/contact",
+    catalogPageSize: 64,
+    catalogColumns: 4,
+  },
+};
+
+function escapeHtml(value = "") {
+  return String(value)
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
+}
+
+function contentValue(section, key, fallback = "") {
+  const value = managedContent?.[section]?.[key];
+  return escapeHtml(value === undefined || value === null ? fallback : value);
+}
 
 const brand = `
   <a class="brand" href="/" aria-label="OWNEX Commerce home">
@@ -212,7 +239,7 @@ function header() {
             <span class="header-search-icon" aria-hidden="true"></span>
             <input name="search" type="search" aria-label="Search products" placeholder="What are you looking?" />
           </form>
-          <a class="button button-primary button-small" href="/contact">Start a project <span>↗</span></a>
+          <a class="button button-primary button-small" href="${contentValue("site", "headerCtaUrl", "/contact")}">${contentValue("site", "headerCtaLabel", "Start a project")} <span>↗</span></a>
         </div>
         <details class="mobile-nav">
           <summary aria-label="Open menu"><span></span><span></span><span></span></summary>
@@ -234,8 +261,8 @@ function footer() {
       <div class="footer-top">
         <div class="footer-intro">
           ${brand}
-          <p>Standardized commerce operations that turn ambition into reliable execution and sustainable growth.</p>
-          <a href="mailto:hello@ownexcommerce.com">hello@ownexcommerce.com</a>
+          <p>${contentValue("site", "footerDescription", "Standardized commerce operations that turn ambition into reliable execution and sustainable growth.")}</p>
+          <a href="mailto:${contentValue("site", "email", "hello@ownexcommerce.com")}">${contentValue("site", "email", "hello@ownexcommerce.com")}</a>
         </div>
         <div class="footer-column">
           <h3>Explore</h3>
@@ -272,8 +299,8 @@ function footer() {
 function buttons() {
   return `
     <div class="button-row">
-      <a class="button button-primary" href="/solutions">Explore solutions <span>↗</span></a>
-      <a class="button button-secondary" href="/catalog">View product catalog <span>→</span></a>
+      <a class="button button-primary" href="${contentValue("homepage", "primaryCtaUrl", "/solutions")}">${contentValue("homepage", "primaryCtaLabel", "Explore solutions")} <span>↗</span></a>
+      <a class="button button-secondary" href="${contentValue("homepage", "secondaryCtaUrl", "/catalog")}">${contentValue("homepage", "secondaryCtaLabel", "View product catalog")} <span>→</span></a>
     </div>`;
 }
 
@@ -363,10 +390,10 @@ function finalCta() {
   return `
     <section class="final-cta">
       <div>
-        <span class="eyebrow">READY FOR THE NEXT MOVE?</span>
-        <h2>Turn your commercial vision into reliable execution.</h2>
+        <span class="eyebrow">${contentValue("homepage", "finalCtaEyebrow", "READY FOR THE NEXT MOVE?")}</span>
+        <h2>${contentValue("homepage", "finalCtaTitle", "Turn your commercial vision into reliable execution.")}</h2>
       </div>
-      <a class="button button-primary" href="/contact">Start a conversation <span>↗</span></a>
+      <a class="button button-primary" href="${contentValue("homepage", "finalCtaUrl", "/contact")}">${contentValue("homepage", "finalCtaLabel", "Start a conversation")} <span>↗</span></a>
     </section>`;
 }
 
@@ -384,9 +411,9 @@ function homePage() {
       <div class="hero-glow hero-glow-two"></div>
       <div class="hero-inner">
         <div class="hero-copy">
-          <span class="eyebrow">COMMERCE OPERATIONS, BUILT TO SCALE</span>
-          <h1>Operate with confidence.<br /><span>Grow without limits.</span></h1>
-          <p>OWNEX COMMERCE brings product development, standardized operations, and global fulfillment into one dependable commercial capability.</p>
+          <span class="eyebrow">${contentValue("homepage", "heroEyebrow", "COMMERCE OPERATIONS, BUILT TO SCALE")}</span>
+          <h1>${contentValue("homepage", "heroTitle", "Operate with confidence.")}<br /><span>${contentValue("homepage", "heroAccent", "Grow without limits.")}</span></h1>
+          <p>${contentValue("homepage", "heroDescription", "OWNEX COMMERCE brings product development, standardized operations, and global fulfillment into one dependable commercial capability.")}</p>
           ${buttons()}
           <div class="hero-proof">
             <div><strong>Standardized</strong><span>Operating process</span></div>
@@ -408,7 +435,11 @@ function homePage() {
     </section>
 
     <section class="section categories">
-      ${sectionHeading("EXPLORE THE CATALOG", "Product possibilities for every direction.", "Start with a proven category, then shape the product around your commercial vision.")}
+      ${sectionHeading(
+        contentValue("homepage", "categoryEyebrow", "EXPLORE THE CATALOG"),
+        contentValue("homepage", "categoryTitle", "Product possibilities for every direction."),
+        contentValue("homepage", "categoryDescription", "Start with a proven category, then shape the product around your commercial vision."),
+      )}
       <div class="category-grid">
         ${categories
           .map(
@@ -451,9 +482,9 @@ function homePage() {
         <img src="/assets/our-factory-4-1024x614.jpg" alt="Commerce operations team" />
       </div>
       <div class="story-copy">
-        <span class="eyebrow">BUILT AROUND RELIABILITY</span>
-        <h2>The operating confidence behind sustainable growth.</h2>
-        <p>Growth becomes more predictable when product readiness, quality expectations, and order execution follow one consistent standard. OWNEX COMMERCE is built to make that standard repeatable.</p>
+        <span class="eyebrow">${contentValue("homepage", "storyEyebrow", "BUILT AROUND RELIABILITY")}</span>
+        <h2>${contentValue("homepage", "storyTitle", "The operating confidence behind sustainable growth.")}</h2>
+        <p>${contentValue("homepage", "storyDescription", "Growth becomes more predictable when product readiness, quality expectations, and order execution follow one consistent standard. OWNEX COMMERCE is built to make that standard repeatable.")}</p>
         <div class="metric-grid"><div><strong>1,000+</strong><span>Product possibilities</span></div><div><strong>24/7</strong><span>Operational visibility</span></div><div><strong>Global</strong><span>Fulfillment capability</span></div></div>
         <a class="button button-secondary" href="/about">Discover OWNEX <span>→</span></a>
       </div>
@@ -517,7 +548,10 @@ function catalogPage() {
   const search = (params.get("search") || "").trim();
   const category = (params.get("category") || "").trim();
   const page = Math.max(1, Number.parseInt(params.get("page") || "1", 10) || 1);
-  const perPage = 64;
+  const perPage = Math.max(
+    8,
+    Number.parseInt(managedContent?.site?.catalogPageSize || "64", 10) || 64,
+  );
   const group = catalogGroups.find((item) => item.name === category);
   const filtered = catalogProducts.filter((item) => {
     const itemCategories = item.categories || [item.category].filter(Boolean);
@@ -837,10 +871,29 @@ function bindPageInteractions() {
 
   const contact = document.querySelector(".contact-form");
   if (contact) {
-    contact.addEventListener("submit", (event) => {
+    contact.addEventListener("submit", async (event) => {
       event.preventDefault();
-      contact.querySelector(".form-note").textContent =
-        "Thank you. The form interaction works; delivery will be connected after approval.";
+      const note = contact.querySelector(".form-note");
+      const submit = contact.querySelector('button[type="submit"]');
+      const formData = new FormData(contact);
+      submit.disabled = true;
+      note.textContent = "Sending...";
+      try {
+        const response = await fetch("/api/public/inquiries", {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify(Object.fromEntries(formData.entries())),
+        });
+        if (!response.ok) throw new Error("Unable to send");
+        contact.reset();
+        note.textContent =
+          "Thank you. Your request has been recorded and our team will contact you shortly.";
+      } catch {
+        note.textContent =
+          "We could not send this request. Please email us directly.";
+      } finally {
+        submit.disabled = false;
+      }
     });
   }
 }
@@ -853,31 +906,110 @@ function render(path = window.location.pathname) {
   window.scrollTo({ top: 0, behavior: "instant" });
 }
 
-async function loadCatalogData() {
+async function loadManagedData() {
   try {
-    const response = await fetch("/data/products.json");
-    if (!response.ok) return;
-    const payload = await response.json();
-    if (!Array.isArray(payload.products) || !payload.products.length) return;
-    catalogProducts = payload.products.map((item) => {
-      const categories = (item.categories || []).map((category) =>
-        decodeCatalogText(category.name),
-      );
-      return {
+    const [contentResponse, productsResponse, postsResponse, categoriesResponse] =
+      await Promise.all([
+        fetch("/data/content.json", { cache: "no-store" }),
+        fetch("/data/products.json", { cache: "no-store" }),
+        fetch("/data/posts.json", { cache: "no-store" }),
+        fetch("/data/categories.json", { cache: "no-store" }),
+      ]);
+    if (
+      !contentResponse.ok ||
+      !productsResponse.ok ||
+      !postsResponse.ok ||
+      !categoriesResponse.ok
+    ) {
+      throw new Error("Managed content unavailable");
+    }
+    const [contentPayload, productsPayload, postsPayload, categoriesPayload] =
+      await Promise.all([
+        contentResponse.json(),
+        productsResponse.json(),
+        postsResponse.json(),
+        categoriesResponse.json(),
+      ]);
+    managedContent = {
+      homepage: contentPayload.homepage || {},
+      site: { ...managedContent.site, ...(contentPayload.site || {}) },
+    };
+    document.documentElement.style.setProperty(
+      "--catalog-columns",
+      String(
+        Math.max(
+          2,
+          Math.min(5, Number(managedContent.site.catalogColumns) || 4),
+        ),
+      ),
+    );
+    if (
+      Array.isArray(productsPayload.products) &&
+      productsPayload.products.length
+    ) {
+      catalogProducts = productsPayload.products.map((item) => {
+        const categories = (item.categories || []).map((category) =>
+          decodeCatalogText(category.name),
+        );
+        return {
+          slug: item.slug,
+          name: decodeCatalogText(item.name),
+          category: categories[0] || "In New",
+          categories,
+          image:
+            item.images?.[0]?.src ||
+            "/assets/gifts-personalized-products.jpg",
+          description:
+            decodeCatalogText(item.summary || "") ||
+            "Custom product available through the synchronized OWNEX COMMERCE catalog.",
+          price: Number(item.price),
+          currencySymbol: item.currencySymbol || "$",
+        };
+      });
+    }
+    if (Array.isArray(postsPayload.posts) && postsPayload.posts.length) {
+      resources = postsPayload.posts.map((item) => ({
         slug: item.slug,
-        name: decodeCatalogText(item.name),
-        category: categories[0] || "In New",
-        categories,
-        image: item.images?.[0]?.src || "/assets/gifts-personalized-products.jpg",
-        description:
-          decodeCatalogText(item.summary || "") ||
-          "Custom product available through the synchronized OWNEX COMMERCE catalog.",
-        price: Number(item.price),
-        currencySymbol: item.currencySymbol || "$",
-      };
-    });
+        title: decodeCatalogText(item.title),
+        image: item.image || "/assets/high-quality-better-value-1.jpg",
+        excerpt: decodeCatalogText(item.excerpt || ""),
+        body: item.body || "",
+      }));
+    }
+    if (
+      Array.isArray(categoriesPayload.groups) &&
+      categoriesPayload.groups.length
+    ) {
+      catalogGroups = categoriesPayload.groups;
+    }
   } catch {
-    catalogProducts = [...products];
+    try {
+      const response = await fetch("/data/products.json");
+      if (!response.ok) return;
+      const payload = await response.json();
+      if (!Array.isArray(payload.products) || !payload.products.length) return;
+      catalogProducts = payload.products.map((item) => {
+        const categories = (item.categories || []).map((category) =>
+          decodeCatalogText(category.name),
+        );
+        return {
+          slug: item.slug,
+          name: decodeCatalogText(item.name),
+          category: categories[0] || "In New",
+          categories,
+          image:
+            item.images?.[0]?.src ||
+            "/assets/gifts-personalized-products.jpg",
+          description:
+            decodeCatalogText(item.summary || "") ||
+            "Custom product available through the synchronized OWNEX COMMERCE catalog.",
+          price: Number(item.price),
+          currencySymbol: item.currencySymbol || "$",
+        };
+      });
+    } catch {
+      catalogProducts = [...products];
+    }
   }
 }
 
@@ -898,4 +1030,4 @@ document.addEventListener("click", (event) => {
 });
 
 window.addEventListener("popstate", () => render());
-loadCatalogData().finally(() => render());
+loadManagedData().finally(() => render());
