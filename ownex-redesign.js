@@ -1,3 +1,6 @@
+const OWNEX_CONTENT_API =
+  "https://ownex-commerce-admin.manhddmkt.chatgpt.site";
+
 const products = [
   {
     slug: "wooden-baseball-glove-sign",
@@ -879,11 +882,14 @@ function bindPageInteractions() {
       submit.disabled = true;
       note.textContent = "Sending...";
       try {
-        const response = await fetch("/api/public/inquiries", {
+        const response = await fetch(
+          `${OWNEX_CONTENT_API}/api/public/inquiries`,
+          {
           method: "POST",
           headers: { "content-type": "application/json" },
           body: JSON.stringify(Object.fromEntries(formData.entries())),
-        });
+          },
+        );
         if (!response.ok) throw new Error("Unable to send");
         contact.reset();
         note.textContent =
@@ -908,28 +914,28 @@ function render(path = window.location.pathname) {
 
 async function loadManagedData() {
   try {
-    const [contentResponse, productsResponse, postsResponse, categoriesResponse] =
-      await Promise.all([
-        fetch("/data/content.json", { cache: "no-store" }),
-        fetch("/data/products.json", { cache: "no-store" }),
-        fetch("/data/posts.json", { cache: "no-store" }),
-        fetch("/data/categories.json", { cache: "no-store" }),
-      ]);
-    if (
-      !contentResponse.ok ||
-      !productsResponse.ok ||
-      !postsResponse.ok ||
-      !categoriesResponse.ok
-    ) {
+    const response = await fetch(
+      `${OWNEX_CONTENT_API}/api/public/bootstrap`,
+      { cache: "no-store" },
+    );
+    if (!response.ok) {
       throw new Error("Managed content unavailable");
     }
-    const [contentPayload, productsPayload, postsPayload, categoriesPayload] =
-      await Promise.all([
-        contentResponse.json(),
-        productsResponse.json(),
-        postsResponse.json(),
-        categoriesResponse.json(),
-      ]);
+    const payload = await response.json();
+    const contentPayload = payload.content || {};
+    const productsPayload = { products: payload.products || [] };
+    const postsPayload = { posts: payload.posts || [] };
+    const categoryRows = payload.categories || [];
+    const categoriesPayload = {
+      groups: categoryRows
+        .filter((item) => !item.parent_slug)
+        .map((parent) => ({
+          name: parent.name,
+          children: categoryRows
+            .filter((item) => item.parent_slug === parent.slug)
+            .map((item) => item.name),
+        })),
+    };
     managedContent = {
       homepage: contentPayload.homepage || {},
       site: { ...managedContent.site, ...(contentPayload.site || {}) },

@@ -1,13 +1,5 @@
 const CONFIG = {
-  owner: "manhddmkt",
-  repo: "manhddmkt.github.io",
-  branch: "ownex-redesign-preview",
-  files: {
-    content: "data/content.json",
-    products: "data/products.json",
-    posts: "data/posts.json",
-    categories: "data/categories.json",
-  },
+  apiBase: "https://ownex-commerce-admin.manhddmkt.chatgpt.site",
 };
 
 const TITLES = {
@@ -21,13 +13,13 @@ const TITLES = {
 };
 
 const state = {
-  token: sessionStorage.getItem("ownex_github_token") || "",
+  token: sessionStorage.getItem("ownex_admin_session") || "",
+  user: null,
   view: "dashboard",
   content: { homepage: {}, site: {} },
   products: [],
   posts: [],
   categories: { groups: [] },
-  shas: {},
   editing: null,
 };
 
@@ -37,21 +29,6 @@ const contentRoot = document.querySelector("#content");
 const toast = document.querySelector("#toast");
 const editorDialog = document.querySelector("#editorDialog");
 const editorForm = document.querySelector("#editorForm");
-
-function utf8ToBase64(value) {
-  const bytes = new TextEncoder().encode(value);
-  let binary = "";
-  for (let index = 0; index < bytes.length; index += 0x8000) {
-    binary += String.fromCharCode(...bytes.subarray(index, index + 0x8000));
-  }
-  return btoa(binary);
-}
-
-function base64ToUtf8(value) {
-  const binary = atob(value.replace(/\n/g, ""));
-  const bytes = Uint8Array.from(binary, (char) => char.charCodeAt(0));
-  return new TextDecoder().decode(bytes);
-}
 
 function escapeHtml(value = "") {
   return String(value)
@@ -80,72 +57,100 @@ function showToast(message) {
   showToast.timer = window.setTimeout(() => toast.classList.add("is-hidden"), 3600);
 }
 
-async function githubApi(path, options = {}) {
-  const response = await fetch(`https://api.github.com${path}`, {
+async function adminApi(path, options = {}) {
+  const headers = { ...(options.headers || {}) };
+  if (state.token) headers.Authorization = `Bearer ${state.token}`;
+  if (options.body && !(options.body instanceof FormData)) {
+    headers["Content-Type"] = "application/json";
+  }
+  const response = await fetch(`${CONFIG.apiBase}${path}`, {
     ...options,
-    headers: {
-      Accept: "application/vnd.github+json",
-      Authorization: `Bearer ${state.token}`,
-      "X-GitHub-Api-Version": "2022-11-28",
-      ...(options.headers || {}),
-    },
+    headers,
   });
   if (!response.ok) {
     const payload = await response.json().catch(() => ({}));
-    throw new Error(payload.message || `GitHub trả về lỗi ${response.status}`);
+    if (response.status === 401 && path !== "/api/auth/login") {
+      sessionStorage.removeItem("ownex_admin_session");
+      state.token = "";
+    }
+    throw new Error(payload.error || `Máy chủ trả về lỗi ${response.status}`);
   }
   return response.status === 204 ? null : response.json();
 }
 
-async function readJsonFile(key) {
-  const path = CONFIG.files[key];
-  const payload = await githubApi(
-    `/repos/${CONFIG.owner}/${CONFIG.repo}/contents/${path}?ref=${encodeURIComponent(CONFIG.branch)}`,
-  );
-  state.shas[path] = payload.sha;
-  return JSON.parse(base64ToUtf8(payload.content));
-}
-
 async function saveJsonFile(key, value, message) {
-  const path = CONFIG.files[key];
-  const payload = await githubApi(
-    `/repos/${CONFIG.owner}/${CONFIG.repo}/contents/${path}`,
-    {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        message,
-        content: utf8ToBase64(`${JSON.stringify(value, null, 2)}\n`),
-        sha: state.shas[path],
-        branch: CONFIG.branch,
-      }),
-    },
-  );
-  state.shas[path] = payload.content.sha;
-  showToast("Đã lưu. Cloudflare đang tự cập nhật website.");
+  let payload;
+  if (key === "content") {
+    const resource = message.toLowerCase().includes("homepage")
+      ? "homepage"
+      : "site";
+    payload = { resource, id: resource, data: value[resource] };
+  } else if (key === "products") {
+    const item = value.products.find(
+      (product) => Number(product.id) === Number(state.editing?.id),
+    );
+    payload = {
+      resource: "products",
+      id: item.id,
+      data: {
+        ...item,
+        imageUrl: item.images?.[0]?.src || "",
+        imageAlt: item.images?.[0]?.alt || item.name,
+      },
+    };
+  } else if (key === "posts") {
+    const item = value.posts[state.editing?.index];
+    payload = {
+      resource: "posts",
+      id: item.id,
+      data: { ...item, publishedAt: item.date, imageUrl: item.image },
+    };
+  } else {
+    payload = { resource: "categories-bulk", id: "all", data: value };
+  }
+  await adminApi("/api/admin", {
+    method: "PATCH",
+    body: JSON.stringify(payload),
+  });
+  showToast("Đã lưu và đồng bộ với website.");
 }
 
 async function loadAll() {
-  const [content, products, posts, categories] = await Promise.all([
-    readJsonFile("content"),
-    readJsonFile("products"),
-    readJsonFile("posts"),
-    readJsonFile("categories"),
-  ]);
-  state.content = content;
-  state.products = products.products || [];
-  state.posts = posts.posts || [];
-  state.categories = categories;
+  const payload = await adminApi("/api/public/bootstrap");
+  state.content = payload.content || { homepage: {}, site: {} };
+  state.products = payload.products || [];
+  state.posts = payload.posts || [];
+  const rows = payload.categories || [];
+  const parents = rows.filter((item) => !item.parent_slug);
+  state.categories = {
+    groups: parents.map((parent) => ({
+      name: parent.name,
+      children: rows
+        .filter((item) => item.parent_slug === parent.slug)
+        .map((item) => item.name),
+    })),
+  };
 }
 
-async function connect(token) {
-  state.token = token.trim();
-  await githubApi(`/repos/${CONFIG.owner}/${CONFIG.repo}`);
-  sessionStorage.setItem("ownex_github_token", state.token);
+async function connect(username, password) {
+  const result = await adminApi("/api/auth/login", {
+    method: "POST",
+    body: JSON.stringify({ username, password }),
+  });
+  state.token = result.token;
+  state.user = result.user;
+  sessionStorage.setItem("ownex_admin_session", state.token);
   await loadAll();
   loginScreen.classList.add("is-hidden");
   adminShell.classList.remove("is-hidden");
+  document.querySelector("#profileName").textContent =
+    state.user?.displayName || "Quản trị viên";
+  if (state.user?.mustChangePassword) {
+    state.view = "settings";
+    showToast("Hãy đổi mật khẩu tạm thời trong phần Cài đặt website.");
+  }
   render();
+  resetIdleTimer();
 }
 
 function metric(label, value, note) {
@@ -349,6 +354,15 @@ function settingsView() {
         ${field("Số cột Catalog", "catalogColumns", s.catalogColumns || 4, { type: "number", min: 2, max: 5 })}
         <div class="form-actions"><button class="primary-button" type="submit">Lưu cài đặt</button></div>
       </form>
+    </section>
+    <section class="panel">
+      <div class="panel-head"><div><span class="eyebrow">BẢO MẬT</span><h2>Đổi mật khẩu quản trị</h2><p>Mật khẩu mới cần ít nhất 12 ký tự, có chữ hoa, chữ thường và chữ số.</p></div></div>
+      <form class="panel-body form-grid" id="passwordForm">
+        ${field("Mật khẩu hiện tại", "currentPassword", "", { type: "password" })}
+        ${field("Mật khẩu mới", "nextPassword", "", { type: "password" })}
+        ${field("Nhập lại mật khẩu mới", "confirmPassword", "", { type: "password", wide: true })}
+        <div class="form-actions"><button class="primary-button" type="submit">Đổi mật khẩu</button></div>
+      </form>
     </section>`;
 }
 
@@ -420,27 +434,14 @@ function openPostEditor(index) {
 
 async function uploadImage(file) {
   if (file.size > 5 * 1024 * 1024) throw new Error("Ảnh vượt quá giới hạn 5 MB.");
-  const safeName = file.name
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .replace(/[^a-zA-Z0-9._-]+/g, "-")
-    .toLowerCase();
-  const path = `assets/uploads/${Date.now()}-${safeName}`;
-  const bytes = new Uint8Array(await file.arrayBuffer());
-  let binary = "";
-  for (let index = 0; index < bytes.length; index += 0x8000) {
-    binary += String.fromCharCode(...bytes.subarray(index, index + 0x8000));
-  }
-  await githubApi(`/repos/${CONFIG.owner}/${CONFIG.repo}/contents/${path}`, {
-    method: "PUT",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      message: `Upload ${safeName} from OWNEX Admin`,
-      content: btoa(binary),
-      branch: CONFIG.branch,
-    }),
+  const form = new FormData();
+  form.append("file", file);
+  form.append("altText", file.name.replace(/\.[^.]+$/, ""));
+  const result = await adminApi("/api/admin/media", {
+    method: "POST",
+    body: form,
   });
-  return `/${path}`;
+  return new URL(result.url, CONFIG.apiBase).href;
 }
 
 document.querySelector("#loginForm").addEventListener("submit", async (event) => {
@@ -448,13 +449,16 @@ document.querySelector("#loginForm").addEventListener("submit", async (event) =>
   const button = event.currentTarget.querySelector("button");
   const message = document.querySelector("#loginMessage");
   button.disabled = true;
-  message.textContent = "Đang kiểm tra quyền truy cập...";
+  message.textContent = "Đang đăng nhập...";
   try {
-    await connect(document.querySelector("#tokenInput").value);
+    await connect(
+      document.querySelector("#usernameInput").value,
+      document.querySelector("#passwordInput").value,
+    );
     message.textContent = "";
   } catch (error) {
-    sessionStorage.removeItem("ownex_github_token");
-    message.textContent = `${error.message}. Kiểm tra token và quyền Contents: Read and write.`;
+    sessionStorage.removeItem("ownex_admin_session");
+    message.textContent = error.message;
   } finally {
     button.disabled = false;
   }
@@ -469,8 +473,9 @@ document.querySelector("#menuButton").addEventListener("click", () => {
   document.querySelector("#sidebar").classList.toggle("is-open");
 });
 
-document.querySelector("#disconnectButton").addEventListener("click", () => {
-  sessionStorage.removeItem("ownex_github_token");
+document.querySelector("#disconnectButton").addEventListener("click", async () => {
+  await adminApi("/api/auth/logout", { method: "POST" }).catch(() => {});
+  sessionStorage.removeItem("ownex_admin_session");
   location.reload();
 });
 
@@ -524,6 +529,22 @@ contentRoot.addEventListener("submit", async (event) => {
           .filter(Boolean),
       }));
       await saveJsonFile("categories", state.categories, "Update catalog categories from OWNEX Admin");
+    }
+    if (event.target.id === "passwordForm") {
+      const values = formObject(event.target);
+      if (values.nextPassword !== values.confirmPassword) {
+        throw new Error("Mật khẩu nhập lại không khớp.");
+      }
+      await adminApi("/api/auth/password", {
+        method: "POST",
+        body: JSON.stringify({
+          currentPassword: values.currentPassword,
+          nextPassword: values.nextPassword,
+        }),
+      });
+      state.user.mustChangePassword = false;
+      event.target.reset();
+      showToast("Đã đổi mật khẩu quản trị.");
     }
     if (event.target.id === "uploadForm") {
       const file = document.querySelector("#mediaFile").files[0];
@@ -606,9 +627,37 @@ editorForm.addEventListener("submit", async (event) => {
   }
 });
 
+async function restoreSession() {
+  const result = await adminApi("/api/auth/session");
+  state.user = result.user;
+  await loadAll();
+  loginScreen.classList.add("is-hidden");
+  adminShell.classList.remove("is-hidden");
+  document.querySelector("#profileName").textContent =
+    state.user?.displayName || "Quản trị viên";
+  render();
+}
+
+let idleTimer;
+function resetIdleTimer() {
+  window.clearTimeout(idleTimer);
+  if (!state.token) return;
+  idleTimer = window.setTimeout(async () => {
+    await adminApi("/api/auth/logout", { method: "POST" }).catch(() => {});
+    sessionStorage.removeItem("ownex_admin_session");
+    location.reload();
+  }, 30 * 60 * 1000);
+}
+
+["click", "keydown", "pointerdown", "scroll"].forEach((eventName) => {
+  window.addEventListener(eventName, resetIdleTimer, { passive: true });
+});
+
 if (state.token) {
-  connect(state.token).catch(() => {
-    sessionStorage.removeItem("ownex_github_token");
-    state.token = "";
-  });
+  restoreSession()
+    .then(resetIdleTimer)
+    .catch(() => {
+      sessionStorage.removeItem("ownex_admin_session");
+      state.token = "";
+    });
 }

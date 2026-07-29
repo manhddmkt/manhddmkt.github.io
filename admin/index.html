@@ -6,7 +6,7 @@
     <meta name="robots" content="noindex,nofollow" />
     <meta
       http-equiv="Content-Security-Policy"
-      content="default-src 'self'; connect-src 'self' https://api.github.com; img-src 'self' data: blob: https:; style-src 'self'; script-src 'self';"
+      content="default-src 'self'; connect-src 'self' https://ownex-commerce-admin.manhddmkt.chatgpt.site; img-src 'self' data: blob: https:; style-src 'self'; script-src 'self';"
     />
     <meta name="theme-color" content="#f4f7fb" />
     <title>OWNEX Commerce Admin</title>
@@ -22,37 +22,37 @@
         <span class="eyebrow">TRUNG TÂM QUẢN TRỊ</span>
         <h1>Quản lý nội dung website OWNEX COMMERCE.</h1>
         <p>
-          Kết nối bằng GitHub để chỉnh sửa trực tiếp nội dung website đang chạy
-          trên Cloudflare. Mã truy cập chỉ được giữ trong phiên trình duyệt này.
+          Đăng nhập bằng tài khoản quản trị để chỉnh sửa nội dung website đang
+          chạy trên Cloudflare.
         </p>
         <form id="loginForm" class="login-form">
           <label>
-            <span>GitHub Fine-grained token</span>
+            <span>Tài khoản Admin</span>
             <input
-              id="tokenInput"
-              type="password"
-              autocomplete="off"
-              placeholder="github_pat_..."
+              id="usernameInput"
+              type="text"
+              autocomplete="username"
+              placeholder="admin"
               required
             />
           </label>
-          <button type="submit" class="primary-button">Kết nối GitHub</button>
+          <label>
+            <span>Mật khẩu</span>
+            <input
+              id="passwordInput"
+              type="password"
+              autocomplete="current-password"
+              placeholder="Nhập mật khẩu"
+              required
+            />
+          </label>
+          <button type="submit" class="primary-button">Đăng nhập</button>
           <p class="form-message" id="loginMessage" aria-live="polite"></p>
         </form>
-        <details class="token-help">
-          <summary>Cách tạo mã truy cập an toàn</summary>
-          <ol>
-            <li>Mở GitHub → Settings → Developer settings.</li>
-            <li>Tạo Fine-grained token chỉ cho repo <b>manhddmkt.github.io</b>.</li>
-            <li>Cấp quyền <b>Contents: Read and write</b>.</li>
-          </ol>
-          <a
-            href="https://github.com/settings/personal-access-tokens/new"
-            target="_blank"
-            rel="noreferrer"
-            >Mở trang tạo token ↗</a
-          >
-        </details>
+        <p class="token-help">
+          Phiên đăng nhập tự hết hạn sau 30 phút không hoạt động. Không cần nhập
+          hoặc lưu GitHub token trên trình duyệt.
+        </p>
       </div>
     </section>
 
@@ -77,7 +77,7 @@
         </nav>
         <div class="sidebar-footer">
           <span class="connection-dot"></span>
-          <div><b>Đã kết nối</b><small>GitHub · Cloudflare</small></div>
+          <div><b>Đã đăng nhập</b><small>Phiên quản trị bảo mật</small></div>
         </div>
       </aside>
 
@@ -98,7 +98,7 @@
             >
             <button class="profile-button" id="disconnectButton">
               <span>ĐM</span>
-              <div><b>Đào Đức Mạnh</b><small>Ngắt kết nối</small></div>
+              <div><b id="profileName">Đào Đức Mạnh</b><small>Đăng xuất</small></div>
             </button>
           </div>
         </header>
