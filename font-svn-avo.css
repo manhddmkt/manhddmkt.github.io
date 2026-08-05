@@ -30,6 +30,23 @@
   font-display: swap;
 }
 
+/* Explicit file-bound aliases prevent browser weight substitution. */
+@font-face {
+  font-family: "OWNEX-Avo-Regular-File";
+  src: url("/assets/fonts/SVN-Avo.ttf") format("truetype");
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "OWNEX-Avo-Bold-File";
+  src: url("/assets/fonts/SVN-Avo%20bold.ttf") format("truetype");
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+}
+
 html,
 body,
 button,
@@ -37,28 +54,4 @@ input,
 select,
 textarea {
   font-family: "SVN-Avo", Arial, sans-serif;
-}
-
-body {
-  -webkit-font-smoothing: auto;
-}
-
-.site-header {
-  background: #fff;
-  -webkit-backdrop-filter: none;
-  backdrop-filter: none;
-}
-
-.site-header .desktop-nav > a,
-.site-header .nav-group > a,
-.site-header .nav-dropdown a,
-.site-header .mobile-nav a,
-.site-header .button {
-  font-weight: 700;
-}
-
-h1,
-h2 {
-  font-weight: 400 !important;
-  letter-spacing: 0 !important;
 }
