@@ -109,6 +109,6 @@
 
   function schedule(){if(scheduled)return;scheduled=true;requestAnimationFrame(()=>{scheduled=false;render()})}
   async function load(){try{const r=await fetch(`${API}/api/public/bootstrap`,{cache:"no-store"});if(!r.ok)return;const p=await r.json(),b=p?.content?.homepage?.pageBuilder;if(b?.sections){config=b;schedule()}}catch(e){console.warn("Page Builder:",e)}}
-  function start(){load();window.addEventListener("ownex:languagechange",schedule);window.addEventListener("popstate",()=>setTimeout(schedule));const app=document.querySelector("#app");if(app)new MutationObserver(()=>{if(config&&!document.querySelector("[data-page-builder-runtime]"))schedule()}).observe(app,{childList:true,subtree:true})}
+  function start(){const current=document.querySelector("[data-ownex-home-v2]");if(current&&!baseline)baseline=current.cloneNode(true);load();window.addEventListener("ownex:languagechange",schedule);window.addEventListener("popstate",()=>setTimeout(schedule));const app=document.querySelector("#app");if(app)new MutationObserver(()=>{if(config&&!document.querySelector("[data-page-builder-runtime]"))schedule()}).observe(app,{childList:true,subtree:true})}
   document.readyState==="loading"?document.addEventListener("DOMContentLoaded",start,{once:true}):start();
 })();
