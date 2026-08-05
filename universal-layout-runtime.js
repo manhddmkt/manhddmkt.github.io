@@ -1,17 +1,12 @@
 (() => {
   const API = "https://ownex-commerce-admin.manhddmkt.chatgpt.site";
   const BYPASS = new URLSearchParams(location.search).has("ownexLayoutBypass");
-  let layouts = null;
+  let layouts;
   let applying = false;
   let scheduled = false;
   const contexts = new Map();
 
-  const lang = () =>
-    window.OWNEX_I18N?.getLanguage?.() ||
-    localStorage.getItem("ownex-language") ||
-    layouts?.defaultLanguage ||
-    "vi";
-
+  const language = () => window.OWNEX_I18N?.getLanguage?.() || localStorage.getItem("ownex-language") || layouts?.defaultLanguage || "vi";
   const pageKey = (path = location.pathname) => {
     const clean = path.replace(/\/+$/, "") || "/";
     if (clean === "/") return "home";
@@ -30,7 +25,6 @@
     if (clean === "/terms") return "terms";
     return "not-found";
   };
-
   const read = (root, selector, mode = "text") => {
     const node = root?.querySelector(selector);
     if (!node) return "";
@@ -99,12 +93,9 @@
     });
   }
 
-  function styleFor(id, css) {
+  function setStyle(id, css) {
     let style = document.querySelector(`#${id}`);
-    if (!css) {
-      style?.remove();
-      return;
-    }
+    if (!css) return style?.remove();
     if (!style) {
       style = document.createElement("style");
       style.id = id;
@@ -112,13 +103,10 @@
     }
     style.textContent = css;
   }
-
-  function localized(config, field) {
+  const localized = (config, field) => {
     const value = config?.[field];
-    if (value && typeof value === "object") return value[lang()] || value.vi || value.en || "";
-    return value || "";
-  }
-
+    return value && typeof value === "object" ? value[language()] || value.vi || value.en || "" : value || "";
+  };
   function replaceOuter(current, html, marker) {
     if (!current || !html) return current;
     const template = document.createElement("template");
@@ -131,7 +119,7 @@
   }
 
   function bindInteractions(root = document) {
-    root.querySelectorAll(".header-search, .ownex-new-header__search, [data-ownex-search]").forEach((form) => {
+    root.querySelectorAll(".header-search,.ownex-new-header__search,[data-ownex-search]").forEach((form) => {
       if (form.dataset.ownexBound) return;
       form.dataset.ownexBound = "1";
       form.addEventListener("submit", (event) => {
@@ -158,7 +146,7 @@
       form.addEventListener("submit", (event) => {
         event.preventDefault();
         const note = form.querySelector(".form-note");
-        if (note) note.textContent = lang() === "vi" ? "Cảm ơn bạn đã đăng ký." : "Thank you for subscribing.";
+        if (note) note.textContent = language() === "vi" ? "Cảm ơn bạn đã đăng ký." : "Thank you for subscribing.";
       });
     });
     root.querySelectorAll(".contact-form").forEach((form) => {
@@ -169,7 +157,7 @@
         const note = form.querySelector(".form-note");
         const submit = form.querySelector('[type="submit"]');
         if (submit) submit.disabled = true;
-        if (note) note.textContent = lang() === "vi" ? "Đang gửi..." : "Sending...";
+        if (note) note.textContent = language() === "vi" ? "Đang gửi..." : "Sending...";
         try {
           const response = await fetch(`${API}/api/public/inquiries`, {
             method: "POST",
@@ -178,9 +166,9 @@
           });
           if (!response.ok) throw new Error("send failed");
           form.reset();
-          if (note) note.textContent = lang() === "vi" ? "Yêu cầu đã được ghi nhận." : "Your request has been recorded.";
+          if (note) note.textContent = language() === "vi" ? "Yêu cầu đã được ghi nhận." : "Your request has been recorded.";
         } catch {
-          if (note) note.textContent = lang() === "vi" ? "Không thể gửi. Vui lòng liên hệ qua email." : "Unable to send. Please contact us by email.";
+          if (note) note.textContent = language() === "vi" ? "Không thể gửi. Vui lòng liên hệ qua email." : "Unable to send. Please contact us by email.";
         } finally {
           if (submit) submit.disabled = false;
         }
@@ -189,45 +177,38 @@
   }
 
   function applyGlobal(target, config, styleId) {
-    if (!config?.enabled) {
-      styleFor(styleId, "");
-      return;
-    }
-    const html = localized(config, "html");
+    if (!config?.enabled) return setStyle(styleId, "");
     const selector = target === "header" ? "header" : "footer";
     let node = document.querySelector(`${selector}[data-ownex-layout-custom="${target}"]`);
-    if (!node) node = replaceOuter(document.querySelector(selector), html, target);
-    styleFor(styleId, config.css || "");
+    if (!node) node = replaceOuter(document.querySelector(selector), localized(config, "html"), target);
+    setStyle(styleId, config.css || "");
     bindInteractions(node || document);
   }
 
-  function applyPage() {
+  function apply() {
     if (!layouts || BYPASS || applying) return;
     const main = document.querySelector("main");
     if (!main) return;
     const key = pageKey();
     const routeId = `${key}:${location.pathname}${location.search}`;
     if (!main.dataset.ownexLayoutCustom) contexts.set(routeId, extractContext(main, key));
-
     applyGlobal("header", layouts.globals?.header, "ownex-custom-header-css");
     applyGlobal("footer", layouts.globals?.footer, "ownex-custom-footer-css");
-
     const config = layouts.pages?.[key];
     if (!config?.enabled) {
-      styleFor("ownex-custom-page-css", "");
-      bindInteractions();
-      return;
+      setStyle("ownex-custom-page-css", "");
+      return bindInteractions();
     }
     const html = localized(config, "html");
     if (!html) return;
-    const marker = `${key}:${lang()}`;
+    const marker = `${key}:${language()}`;
     if (main.dataset.ownexLayoutCustom === marker) return;
     applying = true;
     try {
       main.innerHTML = html;
       main.dataset.ownexLayoutCustom = marker;
       hydrate(main, contexts.get(routeId) || { values: {}, slots: {} });
-      styleFor("ownex-custom-page-css", config.css || "");
+      setStyle("ownex-custom-page-css", config.css || "");
       const title = localized(config, "title");
       if (title) document.title = title;
       bindInteractions(main);
@@ -235,42 +216,32 @@
       applying = false;
     }
   }
-
   function schedule() {
     if (scheduled || BYPASS) return;
     scheduled = true;
     requestAnimationFrame(() => {
       scheduled = false;
-      applyPage();
+      apply();
     });
   }
-
   async function load() {
     if (BYPASS) return;
     try {
       const response = await fetch(`${API}/api/public/bootstrap`, { cache: "no-store" });
       if (!response.ok) return;
       const payload = await response.json();
-      layouts = payload?.content?.homepage?.siteLayouts || null;
+      layouts = payload?.content?.homepage?.siteLayouts;
       if (layouts) schedule();
     } catch (error) {
       console.warn("Universal layouts unavailable", error);
     }
   }
-
   function start() {
+    if (BYPASS) return;
     load();
     const app = document.querySelector("#app");
     if (app) new MutationObserver(schedule).observe(app, { childList: true, subtree: true });
-    addEventListener("ownex:languagechange", () => {
-      document.querySelector("main")?.removeAttribute("data-ownex-layout-custom");
-      document.querySelector('header[data-ownex-layout-custom="header"]')?.remove();
-      document.querySelector('footer[data-ownex-layout-custom="footer"]')?.remove();
-      location.reload();
-    });
+    addEventListener("ownex:languagechange", () => location.reload());
   }
-
-  document.readyState === "loading"
-    ? document.addEventListener("DOMContentLoaded", start, { once: true })
-    : start();
+  document.readyState === "loading" ? document.addEventListener("DOMContentLoaded", start, { once: true }) : start();
 })();
