@@ -58,11 +58,12 @@
   justify-self: center;
   display: flex;
   align-items: center;
-  gap: 4px;
-  padding: 6px;
-  background: #f3f7fd;
-  border: 1px solid #e1eaf5;
-  border-radius: 14px;
+  gap: clamp(24px, 2.4vw, 42px);
+  padding: 0;
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
 }
 
 .ownex-new-header__item {
@@ -72,13 +73,13 @@
 }
 
 .ownex-new-header__link {
-  min-height: 42px;
-  padding: 0 15px;
+  min-height: auto;
+  padding: 0;
   display: inline-flex;
   align-items: center;
   gap: 7px;
   color: #203a58;
-  border-radius: 10px;
+  border-radius: 0;
   text-decoration: none;
   white-space: nowrap;
   font-family: "OWNEX-Avo-Bold-File", Arial, sans-serif;
@@ -92,8 +93,8 @@
 .ownex-new-header__link:hover,
 .ownex-new-header__link:focus-visible {
   color: #1769e0;
-  background: #ffffff;
-  box-shadow: 0 4px 14px rgba(11, 35, 66, 0.08);
+  background: transparent;
+  box-shadow: none;
 }
 
 .ownex-new-header__caret {
@@ -246,11 +247,7 @@
   }
 
   .ownex-new-header__nav {
-    gap: 2px;
-  }
-
-  .ownex-new-header__link {
-    padding-inline: 12px;
+    gap: 22px;
   }
 
   .ownex-new-header__search {
