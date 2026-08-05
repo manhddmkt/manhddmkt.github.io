@@ -17,7 +17,6 @@
               <a class="ownex-new-header__link" href="/about">About Us <span class="ownex-new-header__caret" aria-hidden="true"></span></a>
               <div class="ownex-new-header__dropdown">
                 <a href="/about">About OWNEX</a>
-                <a href="/contact">Contact</a>
               </div>
             </div>
 
