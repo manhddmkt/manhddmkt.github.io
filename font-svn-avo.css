@@ -38,3 +38,27 @@ select,
 textarea {
   font-family: "SVN-Avo", Arial, sans-serif;
 }
+
+body {
+  -webkit-font-smoothing: auto;
+}
+
+.site-header {
+  background: #fff;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+
+.site-header .desktop-nav > a,
+.site-header .nav-group > a,
+.site-header .nav-dropdown a,
+.site-header .mobile-nav a,
+.site-header .button {
+  font-weight: 700;
+}
+
+h1,
+h2 {
+  font-weight: 400 !important;
+  letter-spacing: 0 !important;
+}
