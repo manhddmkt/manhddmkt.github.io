@@ -3,7 +3,7 @@
   src:
     local("SVN-Avo"),
     local("SVN Avo"),
-    local("SVN-Avo Regular");
+    url("https://ownex-commerce.pages.dev/assets/fonts/SVN-Avo.ttf") format("truetype");
   font-style: normal;
   font-weight: 400;
   font-display: swap;
@@ -12,11 +12,35 @@
 @font-face {
   font-family: "SVN-Avo";
   src:
-    local("SVN-Avo Bold"),
+    local("SVN-Avo italic"),
+    local("SVN Avo Italic"),
+    url("https://ownex-commerce.pages.dev/assets/fonts/SVN-Avo italic.ttf") format("truetype");
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "SVN-Avo";
+  src:
+    local("SVN-Avo bold"),
     local("SVN Avo Bold"),
-    local("SVN-Avobold");
+    local("SVN-Avobold"),
+    url("https://ownex-commerce.pages.dev/assets/fonts/SVN-Avo bold.ttf") format("truetype");
   font-style: normal;
-  font-weight: 700 900;
+  font-weight: 700;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "SVN-Avo";
+  src:
+    local("SVN-Avo bold italic"),
+    local("SVN Avo Bold Italic"),
+    local("SVN-Avobolditalic"),
+    url("https://ownex-commerce.pages.dev/assets/fonts/SVN-Avo bold italic.ttf") format("truetype");
+  font-style: italic;
+  font-weight: 700;
   font-display: swap;
 }
 
