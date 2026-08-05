@@ -1,10 +1,10 @@
-/* SVN-Avo rendering corrections: use real bundled weights and natural spacing. */
+/* SVN-Avo typography mapping: use only the real bundled 400 and 700 faces. */
 html,
 body {
   font-synthesis: none;
-  font-kerning: normal;
-  font-feature-settings: "kern" 1, "liga" 1;
-  text-rendering: optimizeLegibility;
+  font-kerning: auto;
+  font-feature-settings: normal;
+  text-rendering: auto;
   -webkit-font-smoothing: auto;
   -moz-osx-font-smoothing: auto;
 }
@@ -15,32 +15,28 @@ body {
   backdrop-filter: none;
 }
 
-.desktop-nav,
+/* Header navigation is body copy, not a display heading. Use the real Regular face. */
 .desktop-nav > a,
-.nav-group,
 .nav-group > a,
-.nav-dropdown,
-.nav-dropdown a {
+.nav-dropdown a,
+.header-search input {
+  font-weight: 400;
+  font-style: normal;
   font-synthesis: none;
-  font-kerning: normal;
-  text-rendering: optimizeLegibility;
+  font-kerning: auto;
+  font-feature-settings: normal;
+  text-rendering: auto;
+  letter-spacing: 0;
+  line-height: 1.3;
   text-shadow: none;
   transform: none;
-}
-
-.desktop-nav > a,
-.nav-group > a {
-  font-weight: 700;
-  letter-spacing: 0.005em;
-  line-height: 1.25;
 }
 
 .nav-group > a span {
   font-weight: 400;
 }
 
-/* The original design used -0.055em tracking and weight 650.
-   That compresses SVN-Avo's round glyphs and makes them look distorted. */
+/* Large SVN-Avo headings should use Regular because no Semibold face exists. */
 .hero h1,
 .page-hero h1,
 .solution-detail-hero h1,
@@ -48,13 +44,14 @@ body {
 .not-found h1,
 .detail-copy h1,
 .article-page h1 {
-  font-weight: 700;
-  letter-spacing: -0.015em;
-  line-height: 1.06;
+  font-weight: 400;
+  font-style: normal;
   font-synthesis: none;
-  font-kerning: normal;
-  font-feature-settings: "kern" 1, "liga" 1;
-  text-rendering: optimizeLegibility;
+  font-kerning: auto;
+  font-feature-settings: normal;
+  text-rendering: auto;
+  letter-spacing: 0;
+  line-height: 1.08;
   text-shadow: none;
   transform: none;
 }
@@ -72,22 +69,28 @@ body {
 .final-cta h2,
 .connection-band h2,
 .scale-banner h2 {
-  font-weight: 700;
-  letter-spacing: -0.01em;
-  line-height: 1.1;
+  font-weight: 400;
+  font-style: normal;
   font-synthesis: none;
-  font-kerning: normal;
-  text-rendering: optimizeLegibility;
+  font-kerning: auto;
+  font-feature-settings: normal;
+  text-rendering: auto;
+  letter-spacing: 0;
+  line-height: 1.12;
+  text-shadow: none;
 }
 
-/* Only the bundled family provides 400 and 700. Keep interface labels on those real faces. */
+/* Use the actual Bold face only where emphasis is intentional. */
 .eyebrow,
 .button,
 .text-link,
 .inline-link,
-.header-search input,
-.nav-dropdown a,
-label > span {
+label > span,
+.product-card h3,
+.category-card h3,
+.resource-card h3,
+.solution-card h3,
+.footer h3 {
   font-weight: 700;
   font-synthesis: none;
 }
