@@ -15,12 +15,14 @@ body {
   backdrop-filter: none;
 }
 
-/* Header navigation is body copy, not a display heading. Use the real Regular face. */
+/* Header brand and navigation intentionally use the bundled Bold face. */
+.site-header .brand-main,
+.site-header .brand-sub,
 .desktop-nav > a,
 .nav-group > a,
 .nav-dropdown a,
-.header-search input {
-  font-weight: 400;
+.mobile-nav a {
+  font-weight: 700;
   font-style: normal;
   font-synthesis: none;
   font-kerning: auto;
@@ -32,11 +34,23 @@ body {
   transform: none;
 }
 
+.site-header .brand-sub {
+  letter-spacing: 0.32em;
+}
+
 .nav-group > a span {
   font-weight: 400;
 }
 
-/* Large SVN-Avo headings should use Regular because no Semibold face exists. */
+/* Search text remains Regular for readability; the CTA is Bold via .button. */
+.header-search input {
+  font-weight: 400;
+  font-style: normal;
+  font-synthesis: none;
+  letter-spacing: 0;
+}
+
+/* Large SVN-Avo headings use Regular because no Semibold face exists. */
 .hero h1,
 .page-hero h1,
 .solution-detail-hero h1,
