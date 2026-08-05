@@ -1,4 +1,14 @@
-/* Keep SVN-Avo navigation crisp and use only real bundled font weights. */
+/* SVN-Avo rendering corrections: use real bundled weights and natural spacing. */
+html,
+body {
+  font-synthesis: none;
+  font-kerning: normal;
+  font-feature-settings: "kern" 1, "liga" 1;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: auto;
+  -moz-osx-font-smoothing: auto;
+}
+
 .site-header {
   background: #ffffff;
   -webkit-backdrop-filter: none;
@@ -21,13 +31,63 @@
 .desktop-nav > a,
 .nav-group > a {
   font-weight: 700;
-  letter-spacing: 0;
-  -webkit-font-smoothing: auto;
-  -moz-osx-font-smoothing: auto;
+  letter-spacing: 0.005em;
+  line-height: 1.25;
 }
 
 .nav-group > a span {
   font-weight: 400;
-  -webkit-font-smoothing: auto;
-  -moz-osx-font-smoothing: auto;
+}
+
+/* The original design used -0.055em tracking and weight 650.
+   That compresses SVN-Avo's round glyphs and makes them look distorted. */
+.hero h1,
+.page-hero h1,
+.solution-detail-hero h1,
+.contact-details h1,
+.not-found h1,
+.detail-copy h1,
+.article-page h1 {
+  font-weight: 700;
+  letter-spacing: -0.015em;
+  line-height: 1.06;
+  font-synthesis: none;
+  font-kerning: normal;
+  font-feature-settings: "kern" 1, "liga" 1;
+  text-rendering: optimizeLegibility;
+  text-shadow: none;
+  transform: none;
+}
+
+.section-heading h2,
+.section-heading-row h2,
+.process-copy h2,
+.story-copy h2,
+.advantage-heading h2,
+.solution-row h2,
+.article-body h2,
+.about-story h2,
+.help-aside h2,
+.product-information h2,
+.final-cta h2,
+.connection-band h2,
+.scale-banner h2 {
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  line-height: 1.1;
+  font-synthesis: none;
+  font-kerning: normal;
+  text-rendering: optimizeLegibility;
+}
+
+/* Only the bundled family provides 400 and 700. Keep interface labels on those real faces. */
+.eyebrow,
+.button,
+.text-link,
+.inline-link,
+.header-search input,
+.nav-dropdown a,
+label > span {
+  font-weight: 700;
+  font-synthesis: none;
 }
