@@ -1,0 +1,34 @@
+@font-face {
+  font-family: "SVN-Avo";
+  src:
+    local("SVN-Avo"),
+    local("SVN Avo"),
+    local("SVN-Avo Regular");
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "SVN-Avo";
+  src:
+    local("SVN-Avo Bold"),
+    local("SVN Avo Bold"),
+    local("SVN-Avobold");
+  font-style: normal;
+  font-weight: 700 900;
+  font-display: swap;
+}
+
+:root {
+  --ownex-font-family: "SVN-Avo", "Avo", Arial, sans-serif;
+}
+
+html,
+body,
+button,
+input,
+select,
+textarea {
+  font-family: var(--ownex-font-family) !important;
+}
