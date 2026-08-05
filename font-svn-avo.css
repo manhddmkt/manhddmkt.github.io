@@ -1,51 +1,37 @@
 @font-face {
-  font-family: "SVN-Avo";
-  src:
-    local("SVN-Avo"),
-    local("SVN Avo"),
-    url("/assets/fonts/SVN-Avo.ttf") format("truetype");
+  font-family: "OWNEX-SVN-Avo-Web";
+  src: url("/assets/fonts/SVN-Avo.ttf?v=fa4b879") format("truetype");
   font-style: normal;
   font-weight: 400;
   font-display: swap;
 }
 
 @font-face {
-  font-family: "SVN-Avo";
-  src:
-    local("SVN-Avo italic"),
-    local("SVN Avo Italic"),
-    url("/assets/fonts/SVN-Avo italic.ttf") format("truetype");
+  font-family: "OWNEX-SVN-Avo-Web";
+  src: url("/assets/fonts/SVN-Avo%20italic.ttf?v=fa4b879") format("truetype");
   font-style: italic;
   font-weight: 400;
   font-display: swap;
 }
 
 @font-face {
-  font-family: "SVN-Avo";
-  src:
-    local("SVN-Avo bold"),
-    local("SVN Avo Bold"),
-    local("SVN-Avobold"),
-    url("/assets/fonts/SVN-Avo bold.ttf") format("truetype");
+  font-family: "OWNEX-SVN-Avo-Web";
+  src: url("/assets/fonts/SVN-Avo%20bold.ttf?v=fa4b879") format("truetype");
   font-style: normal;
   font-weight: 700;
   font-display: swap;
 }
 
 @font-face {
-  font-family: "SVN-Avo";
-  src:
-    local("SVN-Avo bold italic"),
-    local("SVN Avo Bold Italic"),
-    local("SVN-Avobolditalic"),
-    url("/assets/fonts/SVN-Avo bold italic.ttf") format("truetype");
+  font-family: "OWNEX-SVN-Avo-Web";
+  src: url("/assets/fonts/SVN-Avo%20bold%20italic.ttf?v=fa4b879") format("truetype");
   font-style: italic;
   font-weight: 700;
   font-display: swap;
 }
 
 :root {
-  --ownex-font-family: "SVN-Avo", "Avo", Arial, sans-serif;
+  --ownex-font-family: "OWNEX-SVN-Avo-Web", Arial, sans-serif;
 }
 
 html,
