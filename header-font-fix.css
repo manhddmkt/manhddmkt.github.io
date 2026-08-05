@@ -1,0 +1,33 @@
+/* Keep SVN-Avo navigation crisp and use only real bundled font weights. */
+.site-header {
+  background: #ffffff;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+
+.desktop-nav,
+.desktop-nav > a,
+.nav-group,
+.nav-group > a,
+.nav-dropdown,
+.nav-dropdown a {
+  font-synthesis: none;
+  font-kerning: normal;
+  text-rendering: optimizeLegibility;
+  text-shadow: none;
+  transform: none;
+}
+
+.desktop-nav > a,
+.nav-group > a {
+  font-weight: 700;
+  letter-spacing: 0;
+  -webkit-font-smoothing: auto;
+  -moz-osx-font-smoothing: auto;
+}
+
+.nav-group > a span {
+  font-weight: 400;
+  -webkit-font-smoothing: auto;
+  -moz-osx-font-smoothing: auto;
+}
