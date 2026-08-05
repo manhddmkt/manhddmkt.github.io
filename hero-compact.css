@@ -1,0 +1,71 @@
+/* Compact homepage hero: preserve all content while reducing vertical space. */
+@media (min-width: 901px) {
+  .hero,
+  .hero-inner {
+    min-height: 590px;
+  }
+
+  .hero-copy {
+    padding: 34px 0 28px;
+  }
+
+  .hero h1 {
+    margin: 12px 0 16px;
+  }
+
+  .hero-copy > p {
+    margin-bottom: 22px;
+    line-height: 1.55;
+  }
+
+  .hero-proof {
+    margin-top: 28px;
+    padding-top: 18px;
+  }
+
+  .hero-visual {
+    min-height: 500px;
+  }
+
+  .hero-visual::before {
+    width: 420px;
+    height: 420px;
+    top: 40px;
+    right: 58px;
+  }
+
+  .hero-visual::after {
+    width: 350px;
+    right: 92px;
+    bottom: 40px;
+  }
+
+  .hero-product-main {
+    width: 275px;
+    height: 275px;
+    top: 108px;
+    right: 150px;
+  }
+
+  .hero-product-top {
+    width: 210px;
+    height: 172px;
+    top: 52px;
+    right: 8px;
+  }
+
+  .hero-product-bottom {
+    width: 265px;
+    height: 184px;
+    right: 14px;
+    bottom: 24px;
+  }
+
+  .visual-panel {
+    top: 48px;
+  }
+
+  .visual-badge {
+    bottom: 35px;
+  }
+}
