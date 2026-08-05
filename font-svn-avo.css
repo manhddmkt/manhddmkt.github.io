@@ -1,37 +1,33 @@
 @font-face {
-  font-family: "OWNEX-SVN-Avo-Web";
-  src: url("/assets/fonts/SVN-Avo.ttf?v=fa4b879") format("truetype");
+  font-family: "SVN-Avo";
+  src: url("/assets/fonts/SVN-Avo.ttf") format("truetype");
   font-style: normal;
   font-weight: 400;
   font-display: swap;
 }
 
 @font-face {
-  font-family: "OWNEX-SVN-Avo-Web";
-  src: url("/assets/fonts/SVN-Avo%20italic.ttf?v=fa4b879") format("truetype");
+  font-family: "SVN-Avo";
+  src: url("/assets/fonts/SVN-Avo%20italic.ttf") format("truetype");
   font-style: italic;
   font-weight: 400;
   font-display: swap;
 }
 
 @font-face {
-  font-family: "OWNEX-SVN-Avo-Web";
-  src: url("/assets/fonts/SVN-Avo%20bold.ttf?v=fa4b879") format("truetype");
+  font-family: "SVN-Avo";
+  src: url("/assets/fonts/SVN-Avo%20bold.ttf") format("truetype");
   font-style: normal;
   font-weight: 700;
   font-display: swap;
 }
 
 @font-face {
-  font-family: "OWNEX-SVN-Avo-Web";
-  src: url("/assets/fonts/SVN-Avo%20bold%20italic.ttf?v=fa4b879") format("truetype");
+  font-family: "SVN-Avo";
+  src: url("/assets/fonts/SVN-Avo%20bold%20italic.ttf") format("truetype");
   font-style: italic;
   font-weight: 700;
   font-display: swap;
-}
-
-:root {
-  --ownex-font-family: "OWNEX-SVN-Avo-Web", Arial, sans-serif;
 }
 
 html,
@@ -40,5 +36,5 @@ button,
 input,
 select,
 textarea {
-  font-family: var(--ownex-font-family) !important;
+  font-family: "SVN-Avo", Arial, sans-serif;
 }
