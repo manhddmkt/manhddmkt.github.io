@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="320" height="92" viewBox="0 0 320 92" role="img" aria-labelledby="title desc">
+  <title id="title">OWNEX Commerce</title>
+  <desc id="desc">OWNEX Commerce logo</desc>
+  <rect width="320" height="92" fill="none"/>
+  <g font-family="Arial, Helvetica, sans-serif">
+    <text x="0" y="56" fill="#0b2342" font-size="58" font-weight="800" letter-spacing="-4">OWNE</text>
+    <text x="182" y="56" fill="#1769e0" font-size="58" font-weight="800" letter-spacing="-4">X</text>
+    <text x="4" y="84" fill="#1769e0" font-size="14" font-weight="700" letter-spacing="8">COMMERCE</text>
+  </g>
+</svg>
