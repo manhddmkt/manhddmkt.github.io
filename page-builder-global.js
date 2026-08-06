@@ -1,5 +1,5 @@
 (() => {
-  const API="https://ownex-commerce-admin.manhddmkt.chatgpt.site";
+  const API="";
   const DEFAULT_LOGO="/assets/ownex-logo.svg";
   let config;
   const esc=(v="")=>String(v).replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;").replaceAll("'","&#039;");
@@ -48,7 +48,8 @@
   }
   async function load(){
     try{
-      const r=await fetch(`${API}/api/public/bootstrap?globals=${Date.now()}`,{cache:"no-store"});if(!r.ok)return;
+      const r=await fetch(`${API}/api/public/bootstrap?globals=${Date.now()}`,{cache:"no-store"});
+      if(!r.ok)throw new Error(`Bootstrap ${r.status}`);
       const p=await r.json();
       const globals=p?.content?.homepage?.pageBuilder?.globals||{};
       const site=p?.content?.site||{};
@@ -61,7 +62,11 @@
         }
       };
       apply();
-    }catch(e){console.warn("Page Builder globals:",e)}
+      document.documentElement.dataset.ownexGlobalsLoaded="true";
+    }catch(e){
+      document.documentElement.dataset.ownexGlobalsLoaded="error";
+      console.warn("Page Builder globals:",e);
+    }
   }
   function start(){load();window.addEventListener("ownex:languagechange",apply);const app=document.querySelector("#app");if(app)new MutationObserver(()=>{if(config)requestAnimationFrame(apply)}).observe(app,{childList:true,subtree:true})}
   document.readyState==="loading"?document.addEventListener("DOMContentLoaded",start,{once:true}):start();
