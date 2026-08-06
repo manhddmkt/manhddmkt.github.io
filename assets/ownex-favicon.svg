@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-labelledby="title desc">
+  <title id="title">OWNEX</title>
+  <desc id="desc">Biểu tượng favicon vuông của OWNEX</desc>
+  <rect width="512" height="512" rx="112" fill="#0b2342"/>
+  <path d="M122 151h72l62 81 62-81h72L294 264l104 129h-73l-69-91-69 91h-73l104-129-96-113Z" fill="#ffffff"/>
+  <path d="M322 151h68l-96 113-38-50 66-63Z" fill="#1f6fe5"/>
+</svg>
