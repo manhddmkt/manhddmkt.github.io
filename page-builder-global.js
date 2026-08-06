@@ -1,15 +1,34 @@
 (() => {
   const API="https://ownex-commerce-admin.manhddmkt.chatgpt.site";
+  const DEFAULT_LOGO="/assets/ownex-logo.svg";
   let config;
   const esc=(v="")=>String(v).replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;").replaceAll("'","&#039;");
   const safe=(v="#")=>/^(\/|#|https?:\/\/|mailto:|tel:)/i.test(String(v||""))?esc(v):"#";
   const language=()=>window.OWNEX_I18N?.getLanguage?.()||localStorage.getItem("ownex-language")||config?.defaultLanguage||"vi";
   const local=(value,lang)=>value&&typeof value==="object"?(value[lang]??value.vi??value.en??""):(value??"");
+  const withUnit=(value,fallback="120px")=>{const text=String(value||fallback).trim();return /^\d+(?:\.\d+)?$/.test(text)?`${text}px`:text};
+
+  function applyLogo(header,logo={}){
+    const brand=header?.querySelector(".ownex-new-header__brand,[data-ownex-logo]");
+    if(!brand)return;
+    let image=brand.querySelector("img");
+    if(!image){image=document.createElement("img");brand.replaceChildren(image)}
+    brand.dataset.ownexLogo="image";
+    brand.href=safe(logo.href||"/");
+    image.src=safe(logo.src||DEFAULT_LOGO);
+    image.alt=logo.alt||"OWNEX Commerce";
+    image.style.width=withUnit(logo.width,"120px");
+    image.style.maxWidth="100%";
+    image.style.height="auto";
+    image.style.display="block";
+  }
+
   function apply(){
     if(!config)return;const lang=language(),root=document.documentElement;
     root.style.setProperty("--pb-primary",config.primaryColor||"#1769e0");root.style.setProperty("--pb-navy",config.navyColor||"#0b2342");root.style.setProperty("--pb-soft",config.softColor||"#f4f8ff");root.style.setProperty("--pb-width",`${Number(config.siteWidth||1280)}px`);root.style.setProperty("--pb-spacing",`${Number(config.sectionSpacing||88)}px`);
     const header=document.querySelector(".ownex-new-header:not([data-ownex-layout-custom])"),h=config.header||{};
     if(header){
+      applyLogo(header,h.logo||{});
       const search=header.querySelector(".ownex-new-header__search");if(search)search.hidden=h.showSearch===false;
       const cta=header.querySelector(".ownex-new-header__actions .ownex-new-header__cta");if(cta&&h.cta){cta.href=safe(h.cta.href||"/contact");cta.innerHTML=`${esc(h.cta[lang]||h.cta.vi||h.cta.en||"")} <span>↗</span>`}
       if(Array.isArray(h.nav)&&h.nav.length){
