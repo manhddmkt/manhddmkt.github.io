@@ -3,32 +3,60 @@
   const API = "https://ownex-commerce-admin.manhddmkt.chatgpt.site";
   const DEFAULT_LOGO = "/assets/ownex-logo.svg";
   let currentLogo = null;
+  let logoDirty = false;
 
   const frame = () => document.querySelector("#fleFrame");
   const post = (type, payload = {}) =>
     frame()?.contentWindow?.postMessage({ type, ...payload }, WEBSITE);
 
-  function logoConfig() {
+  const normalizeLogo = (logo = {}) => ({
+    src: logo.src || logo.logoUrl || DEFAULT_LOGO,
+    alt: logo.alt || logo.logoAlt || "OWNEX Commerce",
+    width: logo.width || logo.logoWidth || "120px",
+    href: logo.href || logo.logoHref || "/",
+  });
+
+  function homepageLogoConfig() {
     const homepage = state.content.homepage || (state.content.homepage = {});
     homepage.pageBuilder ||= { version: 1, globals: {}, sections: [] };
     homepage.pageBuilder.globals ||= {};
     homepage.pageBuilder.globals.header ||= {};
-    homepage.pageBuilder.globals.header.logo ||= {
-      src: DEFAULT_LOGO,
-      alt: "OWNEX Commerce",
-      width: "120px",
-      href: "/",
-    };
+    homepage.pageBuilder.globals.header.logo ||= normalizeLogo();
     return homepage.pageBuilder.globals.header.logo;
   }
 
+  function siteLogoConfig() {
+    const site = state.content.site || (state.content.site = {});
+    site.logo ||= normalizeLogo({
+      src: site.logoUrl,
+      alt: site.logoAlt,
+      width: site.logoWidth,
+      href: site.logoHref,
+    });
+    return site.logo;
+  }
+
+  function logoConfig() {
+    const siteLogo = normalizeLogo(siteLogoConfig());
+    const homepageLogo = homepageLogoConfig();
+    Object.assign(homepageLogo, siteLogo);
+    return siteLogo;
+  }
+
   function updateStoredLogo(property, value) {
-    const logo = logoConfig();
-    logo[property] = value;
-    logo.src ||= DEFAULT_LOGO;
-    logo.alt ||= "OWNEX Commerce";
-    logo.width ||= "120px";
-    logo.href ||= "/";
+    const normalizedValue = String(value ?? "");
+    const homepageLogo = homepageLogoConfig();
+    const siteLogo = siteLogoConfig();
+    homepageLogo[property] = normalizedValue;
+    siteLogo[property] = normalizedValue;
+
+    const site = state.content.site;
+    site.logoUrl = siteLogo.src || DEFAULT_LOGO;
+    site.logoAlt = siteLogo.alt || "OWNEX Commerce";
+    site.logoWidth = siteLogo.width || "120px";
+    site.logoHref = siteLogo.href || "/";
+
+    logoDirty = true;
   }
 
   function logoInspector(logo) {
@@ -54,7 +82,7 @@
           <label class="wide"><span>Chiều rộng logo</span><input data-logo-property="width" value="${escapeHtml(logo.width || "120px")}" placeholder="120px"></label>
           <label class="wide"><span>Đường dẫn khi bấm logo</span><input data-logo-property="href" value="${escapeHtml(logo.href || "/")}" placeholder="/"></label>
         </div>
-        <div class="fle-logo-note">Logo là một file ảnh. Bấm <b>Lưu & xuất bản</b> ở thanh trên cùng để áp dụng cho toàn website.</div>
+        <div class="fle-logo-note">Logo là một file ảnh. Bấm <b>Lưu & xuất bản</b> để lưu riêng cấu hình logo và kiểm tra lại từ máy chủ.</div>
       </div>`;
   }
 
@@ -84,15 +112,58 @@
     return new URL(payload.url, API).href;
   }
 
+  async function persistLogo() {
+    if (!logoDirty) return;
+    const expected = normalizeLogo(siteLogoConfig());
+    const site = state.content.site || (state.content.site = {});
+
+    await adminApi("/api/admin", {
+      method: "PATCH",
+      body: JSON.stringify({ resource: "site", id: "site", data: site }),
+    });
+
+    const bootstrap = await adminApi(`/api/public/bootstrap?logoVerify=${Date.now()}`);
+    const savedSite = bootstrap?.content?.site || {};
+    const saved = normalizeLogo(savedSite.logo || {
+      src: savedSite.logoUrl,
+      alt: savedSite.logoAlt,
+      width: savedSite.logoWidth,
+      href: savedSite.logoHref,
+    });
+
+    if (!saved.src || saved.src !== expected.src) {
+      throw new Error("Máy chủ chưa ghi nhận logo mới. Vui lòng thử lại sau khi tải lại Admin.");
+    }
+
+    state.content.site = savedSite;
+    homepageLogoConfig().src = saved.src;
+    homepageLogoConfig().alt = saved.alt;
+    homepageLogoConfig().width = saved.width;
+    homepageLogoConfig().href = saved.href;
+    logoDirty = false;
+  }
+
+  const originalSaveJsonFile = window.saveJsonFile;
+  if (typeof originalSaveJsonFile === "function") {
+    window.saveJsonFile = async function (...args) {
+      const result = await originalSaveJsonFile.apply(this, args);
+      if (logoDirty && args[0] === "content") {
+        await persistLogo();
+        showToast("Đã lưu giao diện và xác nhận logo mới trên máy chủ.");
+      }
+      return result;
+    };
+  }
+
   addEventListener("message", (event) => {
     if (event.origin !== WEBSITE || event.data?.type !== "ownex-logo:selected") return;
     const stored = logoConfig();
-    currentLogo = {
-      src: event.data.logo?.src || stored.src || DEFAULT_LOGO,
-      alt: event.data.logo?.alt || stored.alt || "OWNEX Commerce",
-      width: event.data.logo?.width || stored.width || "120px",
-      href: event.data.logo?.href || stored.href || "/",
-    };
+    currentLogo = normalizeLogo({
+      src: event.data.logo?.src || stored.src,
+      alt: event.data.logo?.alt || stored.alt,
+      width: event.data.logo?.width || stored.width,
+      href: event.data.logo?.href || stored.href,
+    });
     renderLogoInspector();
   });
 
@@ -149,7 +220,7 @@
       post("ownex-logo:mutate", { property: "src", value: url });
       post("ownex-logo:mutate", { property: "alt", value: currentLogo.alt });
       renderLogoInspector();
-      showToast("Đã tải logo lên và áp dụng trong bản xem trước.");
+      showToast("Đã tải logo lên. Bấm Lưu & xuất bản để ghi vào website.");
     } catch (error) {
       showToast(`Không thể tải logo: ${error.message}`);
     } finally {
