@@ -7,9 +7,8 @@
     return `
       <header class="ownex-new-header" data-ownex-new-header>
         <div class="ownex-new-header__inner">
-          <a class="ownex-new-header__brand" href="/" aria-label="OWNEX Commerce home">
-            <span class="ownex-new-header__brand-main">OWNE<span>X</span></span>
-            <span class="ownex-new-header__brand-sub">COMMERCE</span>
+          <a class="ownex-new-header__brand" href="/" aria-label="OWNEX Commerce home" data-ownex-logo="image">
+            <img src="/assets/ownex-logo.svg" alt="OWNEX Commerce" width="120" />
           </a>
 
           <nav class="ownex-new-header__nav" aria-label="Primary navigation">
