@@ -1,52 +1,60 @@
 (() => {
   const WEBSITE = "https://ownex-commerce.pages.dev";
   const API = "https://ownex-commerce-admin.manhddmkt.chatgpt.site";
+  const DEFAULT_LOGO = "/assets/ownex-logo.svg";
   let currentLogo = null;
 
   const frame = () => document.querySelector("#fleFrame");
   const post = (type, payload = {}) =>
     frame()?.contentWindow?.postMessage({ type, ...payload }, WEBSITE);
 
-  function logoInspector(logo) {
-    const isImage = logo.mode === "image";
-    const preview = isImage && logo.src
-      ? `<img src="${escapeHtml(logo.src)}" alt="${escapeHtml(logo.alt || "")}">`
-      : `<div class="fle-logo-text-preview"><b>${escapeHtml(logo.main || "OWNEX")}</b><small>${escapeHtml(logo.sub || "COMMERCE")}</small></div>`;
+  function logoConfig() {
+    const homepage = state.content.homepage || (state.content.homepage = {});
+    homepage.pageBuilder ||= { version: 1, globals: {}, sections: [] };
+    homepage.pageBuilder.globals ||= {};
+    homepage.pageBuilder.globals.header ||= {};
+    homepage.pageBuilder.globals.header.logo ||= {
+      src: DEFAULT_LOGO,
+      alt: "OWNEX Commerce",
+      width: "120px",
+      href: "/",
+    };
+    return homepage.pageBuilder.globals.header.logo;
+  }
 
+  function updateStoredLogo(property, value) {
+    const logo = logoConfig();
+    logo[property] = value;
+    logo.src ||= DEFAULT_LOGO;
+    logo.alt ||= "OWNEX Commerce";
+    logo.width ||= "120px";
+    logo.href ||= "/";
+  }
+
+  function logoInspector(logo) {
+    const src = logo.src || DEFAULT_LOGO;
     return `
       <div class="fle-selection-title">
-        <div><span>LOGO</span><h3>Logo website</h3></div>
+        <div><span>LOGO ẢNH</span><h3>Logo website</h3></div>
         <button type="button" class="fle-close-selection" data-logo-close aria-label="Bỏ chọn">×</button>
       </div>
-      <div class="fle-logo-preview">${preview}</div>
+      <div class="fle-logo-preview"><img src="${escapeHtml(src)}" alt="${escapeHtml(logo.alt || "OWNEX Commerce")}"></div>
       <div class="fle-tabs">
-        <button type="button" class="active">Nội dung</button>
+        <button type="button" class="active">Hình ảnh</button>
       </div>
       <div class="fle-tab-panel active">
         <div class="fle-form-grid">
-          <label class="wide"><span>Loại logo</span>
-            <select data-logo-property="mode">
-              <option value="image" ${isImage ? "selected" : ""}>Logo hình ảnh</option>
-              <option value="text" ${!isImage ? "selected" : ""}>Logo chữ</option>
-            </select>
-          </label>
-
-          <div class="fle-logo-image-fields wide ${isImage ? "" : "is-hidden"}" data-logo-image-fields>
-            <label><span>Tải logo mới</span><input id="fleLogoUpload" type="file" accept="image/png,image/jpeg,image/webp"></label>
+          <div class="fle-logo-image-fields wide">
+            <label><span>Thay ảnh logo</span><input id="fleLogoUpload" type="file" accept="image/png,image/jpeg,image/webp,image/svg+xml"></label>
             <button type="button" class="secondary-button" data-logo-upload>Tải lên & sử dụng</button>
-            <small>PNG, JPG hoặc WebP · tối đa 5 MB</small>
+            <small>PNG, JPG, WebP hoặc SVG · tối đa 5 MB</small>
           </div>
-
-          <label class="wide ${isImage ? "" : "is-hidden"}" data-logo-image-field><span>Đường dẫn ảnh logo</span><input data-logo-property="src" value="${escapeHtml(logo.src || "")}" placeholder="/assets/logo.png"></label>
-          <label class="wide ${isImage ? "" : "is-hidden"}" data-logo-image-field><span>Alt text</span><input data-logo-property="alt" value="${escapeHtml(logo.alt || "OWNEX Commerce")}"></label>
-          <label class="wide ${isImage ? "" : "is-hidden"}" data-logo-image-field><span>Chiều rộng logo</span><input data-logo-property="width" value="${escapeHtml(logo.width || "120px")}" placeholder="120px"></label>
-
-          <label class="wide ${!isImage ? "" : "is-hidden"}" data-logo-text-field><span>Dòng chính</span><input data-logo-property="main" value="${escapeHtml(logo.main || "OWNEX")}"></label>
-          <label class="wide ${!isImage ? "" : "is-hidden"}" data-logo-text-field><span>Dòng phụ</span><input data-logo-property="sub" value="${escapeHtml(logo.sub || "COMMERCE")}"></label>
-
+          <label class="wide"><span>Đường dẫn ảnh logo</span><input data-logo-property="src" value="${escapeHtml(src)}" placeholder="/assets/logo.svg"></label>
+          <label class="wide"><span>Mô tả ảnh (Alt text)</span><input data-logo-property="alt" value="${escapeHtml(logo.alt || "OWNEX Commerce")}"></label>
+          <label class="wide"><span>Chiều rộng logo</span><input data-logo-property="width" value="${escapeHtml(logo.width || "120px")}" placeholder="120px"></label>
           <label class="wide"><span>Đường dẫn khi bấm logo</span><input data-logo-property="href" value="${escapeHtml(logo.href || "/")}" placeholder="/"></label>
         </div>
-        <div class="fle-logo-note">Bấm <b>Lưu & xuất bản</b> ở thanh trên cùng để áp dụng logo cho toàn website.</div>
+        <div class="fle-logo-note">Logo là một file ảnh. Bấm <b>Lưu & xuất bản</b> ở thanh trên cùng để áp dụng cho toàn website.</div>
       </div>`;
   }
 
@@ -78,7 +86,13 @@
 
   addEventListener("message", (event) => {
     if (event.origin !== WEBSITE || event.data?.type !== "ownex-logo:selected") return;
-    currentLogo = event.data.logo || null;
+    const stored = logoConfig();
+    currentLogo = {
+      src: event.data.logo?.src || stored.src || DEFAULT_LOGO,
+      alt: event.data.logo?.alt || stored.alt || "OWNEX Commerce",
+      width: event.data.logo?.width || stored.width || "120px",
+      href: event.data.logo?.href || stored.href || "/",
+    };
     renderLogoInspector();
   });
 
@@ -96,15 +110,16 @@
     if (!input || !currentLogo) return;
     const property = input.dataset.logoProperty;
     currentLogo[property] = input.value;
+    updateStoredLogo(property, input.value);
     post("ownex-logo:mutate", { property, value: input.value });
-    if (property === "mode") setTimeout(renderLogoInspector, 80);
   });
 
   document.addEventListener("input", (event) => {
     const input = event.target.closest?.("[data-logo-property]");
-    if (!input || !currentLogo || input.tagName === "SELECT") return;
+    if (!input || !currentLogo) return;
     const property = input.dataset.logoProperty;
     currentLogo[property] = input.value;
+    updateStoredLogo(property, input.value);
     clearTimeout(input._logoTimer);
     input._logoTimer = setTimeout(
       () => post("ownex-logo:mutate", { property, value: input.value }),
@@ -126,13 +141,15 @@
     try {
       const file = document.querySelector("#fleLogoUpload")?.files?.[0];
       const url = await uploadLogo(file);
-      currentLogo ||= {};
-      currentLogo.mode = "image";
+      currentLogo ||= logoConfig();
       currentLogo.src = url;
-      post("ownex-logo:mutate", { property: "mode", value: "image" });
+      currentLogo.alt = file.name.replace(/\.[^.]+$/, "") || "OWNEX Commerce";
+      updateStoredLogo("src", url);
+      updateStoredLogo("alt", currentLogo.alt);
       post("ownex-logo:mutate", { property: "src", value: url });
+      post("ownex-logo:mutate", { property: "alt", value: currentLogo.alt });
+      renderLogoInspector();
       showToast("Đã tải logo lên và áp dụng trong bản xem trước.");
-      setTimeout(() => post("ownex-logo:select"), 120);
     } catch (error) {
       showToast(`Không thể tải logo: ${error.message}`);
     } finally {
