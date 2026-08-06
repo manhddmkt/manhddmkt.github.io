@@ -7,17 +7,24 @@
   const language=()=>window.OWNEX_I18N?.getLanguage?.()||localStorage.getItem("ownex-language")||config?.defaultLanguage||"vi";
   const local=(value,lang)=>value&&typeof value==="object"?(value[lang]??value.vi??value.en??""):(value??"");
   const withUnit=(value,fallback="120px")=>{const text=String(value||fallback).trim();return /^\d+(?:\.\d+)?$/.test(text)?`${text}px`:text};
+  const normalizeLogo=(logo={})=>({
+    src:logo.src||logo.logoUrl||DEFAULT_LOGO,
+    alt:logo.alt||logo.logoAlt||"OWNEX Commerce",
+    width:logo.width||logo.logoWidth||"120px",
+    href:logo.href||logo.logoHref||"/"
+  });
 
   function applyLogo(header,logo={}){
     const brand=header?.querySelector(".ownex-new-header__brand,[data-ownex-logo]");
     if(!brand)return;
+    const normalized=normalizeLogo(logo);
     let image=brand.querySelector("img");
     if(!image){image=document.createElement("img");brand.replaceChildren(image)}
     brand.dataset.ownexLogo="image";
-    brand.href=safe(logo.href||"/");
-    image.src=safe(logo.src||DEFAULT_LOGO);
-    image.alt=logo.alt||"OWNEX Commerce";
-    image.style.width=withUnit(logo.width,"120px");
+    brand.href=safe(normalized.href);
+    image.src=safe(normalized.src);
+    image.alt=normalized.alt;
+    image.style.width=withUnit(normalized.width,"120px");
     image.style.maxWidth="100%";
     image.style.height="auto";
     image.style.display="block";
@@ -39,7 +46,23 @@
     const footer=document.querySelector(".footer:not([data-ownex-layout-custom])"),f=config.footer||{};
     if(footer){const p=footer.querySelector(".footer-intro p");if(p&&(f[lang]||f.vi||f.en))p.textContent=f[lang]||f.vi||f.en;const mail=footer.querySelector('.footer-intro a[href^="mailto:"]');if(mail&&f.email){mail.textContent=f.email;mail.href=`mailto:${f.email}`}}
   }
-  async function load(){try{const r=await fetch(`${API}/api/public/bootstrap`,{cache:"no-store"});if(!r.ok)return;const p=await r.json();config=p?.content?.homepage?.pageBuilder?.globals;if(config)apply()}catch(e){console.warn("Page Builder globals:",e)}}
+  async function load(){
+    try{
+      const r=await fetch(`${API}/api/public/bootstrap?globals=${Date.now()}`,{cache:"no-store"});if(!r.ok)return;
+      const p=await r.json();
+      const globals=p?.content?.homepage?.pageBuilder?.globals||{};
+      const site=p?.content?.site||{};
+      const siteLogo=site.logo||{src:site.logoUrl,alt:site.logoAlt,width:site.logoWidth,href:site.logoHref};
+      config={
+        ...globals,
+        header:{
+          ...(globals.header||{}),
+          logo:{...normalizeLogo(globals.header?.logo||{}),...normalizeLogo(siteLogo)}
+        }
+      };
+      apply();
+    }catch(e){console.warn("Page Builder globals:",e)}
+  }
   function start(){load();window.addEventListener("ownex:languagechange",apply);const app=document.querySelector("#app");if(app)new MutationObserver(()=>{if(config)requestAnimationFrame(apply)}).observe(app,{childList:true,subtree:true})}
   document.readyState==="loading"?document.addEventListener("DOMContentLoaded",start,{once:true}):start();
 })();
