@@ -4,6 +4,7 @@
   let config;
   const esc=(v="")=>String(v).replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;").replaceAll("'","&#039;");
   const safe=(v="#")=>/^(\/|#|https?:\/\/|mailto:|tel:)/i.test(String(v||""))?esc(v):"#";
+  const safeAsset=(v="")=>/^(\/|https?:\/\/|data:|blob:)/i.test(String(v||""))?String(v):DEFAULT_LOGO;
   const language=()=>window.OWNEX_I18N?.getLanguage?.()||localStorage.getItem("ownex-language")||config?.defaultLanguage||"vi";
   const local=(value,lang)=>value&&typeof value==="object"?(value[lang]??value.vi??value.en??""):(value??"");
   const withUnit=(value,fallback="120px")=>{const text=String(value||fallback).trim();return /^\d+(?:\.\d+)?$/.test(text)?`${text}px`:text};
@@ -14,6 +15,26 @@
     href:logo.href||logo.logoHref||"/"
   });
 
+  function ensureIconLink(rel,id){
+    let link=document.querySelector(`#${id}`)||document.querySelector(`link[rel="${rel}"]`);
+    if(!link){link=document.createElement("link");document.head.appendChild(link)}
+    link.id=id;
+    link.rel=rel;
+    link.dataset.ownexManaged="true";
+    return link;
+  }
+
+  function applyFavicon(src){
+    const href=safeAsset(src||DEFAULT_LOGO);
+    const icon=ensureIconLink("icon","ownexFavicon");
+    icon.href=href;
+    const shortcut=ensureIconLink("shortcut icon","ownexShortcutIcon");
+    shortcut.href=href;
+    const apple=ensureIconLink("apple-touch-icon","ownexAppleTouchIcon");
+    apple.href=href;
+    document.documentElement.dataset.ownexFaviconLoaded="true";
+  }
+
   function applyLogo(header,logo={}){
     const brand=header?.querySelector(".ownex-new-header__brand,[data-ownex-logo]");
     if(!brand)return;
@@ -22,7 +43,7 @@
     if(!image){image=document.createElement("img");brand.replaceChildren(image)}
     brand.dataset.ownexLogo="image";
     brand.href=safe(normalized.href);
-    image.src=safe(normalized.src);
+    image.src=safeAsset(normalized.src);
     image.alt=normalized.alt;
     image.style.width=withUnit(normalized.width,"120px");
     image.style.maxWidth="100%";
@@ -33,9 +54,11 @@
   function apply(){
     if(!config)return;const lang=language(),root=document.documentElement;
     root.style.setProperty("--pb-primary",config.primaryColor||"#1769e0");root.style.setProperty("--pb-navy",config.navyColor||"#0b2342");root.style.setProperty("--pb-soft",config.softColor||"#f4f8ff");root.style.setProperty("--pb-width",`${Number(config.siteWidth||1280)}px`);root.style.setProperty("--pb-spacing",`${Number(config.sectionSpacing||88)}px`);
-    const header=document.querySelector(".ownex-new-header:not([data-ownex-layout-custom])"),h=config.header||{};
+    const h=config.header||{},logo=normalizeLogo(h.logo||{});
+    applyFavicon(logo.src);
+    const header=document.querySelector(".ownex-new-header:not([data-ownex-layout-custom])");
     if(header){
-      applyLogo(header,h.logo||{});
+      applyLogo(header,logo);
       const search=header.querySelector(".ownex-new-header__search");if(search)search.hidden=h.showSearch===false;
       const cta=header.querySelector(".ownex-new-header__actions .ownex-new-header__cta");if(cta&&h.cta){cta.href=safe(h.cta.href||"/contact");cta.innerHTML=`${esc(h.cta[lang]||h.cta.vi||h.cta.en||"")} <span>↗</span>`}
       if(Array.isArray(h.nav)&&h.nav.length){
@@ -65,9 +88,10 @@
       document.documentElement.dataset.ownexGlobalsLoaded="true";
     }catch(e){
       document.documentElement.dataset.ownexGlobalsLoaded="error";
+      applyFavicon(DEFAULT_LOGO);
       console.warn("Page Builder globals:",e);
     }
   }
-  function start(){load();window.addEventListener("ownex:languagechange",apply);const app=document.querySelector("#app");if(app)new MutationObserver(()=>{if(config)requestAnimationFrame(apply)}).observe(app,{childList:true,subtree:true})}
+  function start(){applyFavicon(DEFAULT_LOGO);load();window.addEventListener("ownex:languagechange",apply);const app=document.querySelector("#app");if(app)new MutationObserver(()=>{if(config)requestAnimationFrame(apply)}).observe(app,{childList:true,subtree:true})}
   document.readyState==="loading"?document.addEventListener("DOMContentLoaded",start,{once:true}):start();
 })();
